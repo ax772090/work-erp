@@ -1,0 +1,37 @@
+{
+  "iconList": [
+    {
+      "className": "erp-icon-xitongguanli"
+    }, 
+    {
+      "className": "erp-icon-jichuziliao"
+    }, 
+    {
+      "className": "erp-icon-chanpinguanli"
+    },
+    {
+      "className": "erp-icon-caigouguanli"
+    },
+    {
+      "className": "erp-icon-kucunguanli"
+    },
+    {
+      "className": "erp-icon-amazon"
+    },
+    {
+      "className": "erp-icon-shouye"
+    },
+    {
+      "className": "erp-icon-chanpinguanli"
+    }, 
+    {
+      "className": "erp-icon-cunhuohesuan"
+    },
+    {
+      "className": "erp-icon-CRM"
+    },
+    {
+      "className": "erp-icon-caiwu"
+    }
+  ]
+}

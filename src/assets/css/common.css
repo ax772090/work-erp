@@ -1,0 +1,437 @@
+/* elementUI部分组件一些公共的样式*/
+
+.erpicon-colse {
+  color: blue;
+}
+
+/* 最大tabs标签的top  */
+.site-content--tabs {
+  padding: 34px 0 0;
+}
+
+/* 表格操作下拉样式 */
+.el-dropdown-link {
+  cursor: pointer;
+  color: #409EFF;
+}
+
+.el-icon-arrow-down {
+  font-size: 12px;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* =============================================== 禁用颜色 begin*/
+.el-input.is-disabled .el-input__inner {
+  color: #606266;
+}
+
+.el-textarea.is-disabled .el-textarea__inner {
+  color: #606266;
+}
+
+.el-cascader.is-disabled .el-cascader__label {
+  color: #606266;
+}
+
+.el-tag--info,
+.el-tag--info .el-tag__close {
+  /* color: #909399; */
+  color: #606266;
+}
+
+.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-disabled {
+  color: #606266;
+}
+
+/* checkbox样式 */
+
+.el-checkbox__input.is-disabled.is-checked .el-checkbox__inner {
+  background-color: #f2f6fc;
+  border-color: #606266;
+}
+
+.el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after {
+  border-color: #000;
+}
+
+.el-checkbox__input.is-checked+.el-checkbox__label {
+  color: #606266 !important;
+}
+
+/* =============================================== 校验 */
+
+/* 表格校验提示向上移动2px */
+.el-form-item__error {
+  color: #f56c6c;
+  font-size: 12px;
+  line-height: 1;
+  padding-top: 2px;
+  position: static;
+  /* top: 100%; */
+  /* left: 0; */
+}
+
+/* =============================================== tab栏的padding占位置 */
+.el-tabs__content {
+  /* padding: 0 0 0 0 !important; */
+}
+
+/* =============================================== 非弹框的身体部分 */
+.el-card__body {
+  padding: 5px;
+}
+
+/* =============================================== 栅格样式 */
+.el-row {
+  margin-bottom: 10px;
+}
+
+/* =============================================== 表格table */
+.el-table {
+  font-size: 14px;
+  width: 100%;
+}
+
+.el-table thead {
+  color: #000;
+  /* color: #606266; */
+  font-weight: 500;
+  /* background-color: #909399; */
+  /* background-color: #999; */
+}
+
+.el-table th {
+  background-color: rgb(228, 228, 228)
+}
+/* 解决表头搜索太高问题 */
+.el-table th div{
+  line-height: 0px;
+  overflow: visible;
+}
+
+/* 详情的table内容top对齐 */
+.tableInfo td {
+  vertical-align: top;
+}
+
+/* .el-table td {
+  vertical-align: top;
+} */
+.el-table--border th,
+.el-table__body-wrapper .el-table--border.is-scrolling-left~.el-table__fixed {
+  border-right: 1px solid #ebeef5;
+}
+
+.el-table--border td,
+.el-table__body-wrapper .el-table--border.is-scrolling-left~.el-table__fixed {
+  border-right: 0px solid #ebeef5;
+}
+
+.el-table--medium td {
+  padding: 3px 5px;
+}
+
+.el-table--medium th {
+  padding: 10px 5px;
+}
+
+.el-table tr td .cell {
+  padding: 5px 10px !important;
+  line-height: 18px;
+}
+
+/* 表格变化行 */
+.el-table .warning-row {
+  /* background: #ebeef5; */
+  background: oldlace;
+}
+/* 下面三个, 当前数据排序的图标 */
+.el-table .caret-wrapper{
+  height: 23px;
+}
+
+.el-table .caret-wrapper>.ascending{
+  top: 0px;
+}
+.el-table .caret-wrapper>.descending{
+  bottom: 0px;
+}
+
+/* =============================================== 按钮 */
+.el-button--mini,
+.el-button--mini.is-round {
+  padding: 7px 7px;
+}
+
+.el-radio-button--medium .el-radio-button__inner {
+  padding: 7px 7px;
+}
+
+.el-button.is-circle {
+  padding: 5px;
+}
+
+/* .el-form-item__error {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+} */
+
+.el-button {
+  padding: 5px 10px;
+}
+
+.el-button+.el-button {
+  margin-left: 5px;
+}
+
+/* 单选框的按钮样式 */
+.el-radio-button el-radio-button__inner {
+  padding: 5px 10px;
+}
+
+.el-dialog__title {
+  font-weight: 600
+}
+
+
+/* =============================================== 弹窗dialog样式 */
+.el-dialog>.el-dialog__header {
+  /* padding: 10px; */
+}
+
+.el-dialog>.el-dialog__body {
+  padding: 0 20px;
+}
+
+.el-dialog>.el-dialog__footer {
+  /* padding: 10px; */
+}
+
+
+/* =============================================== 所有框大小 .el-date-picker, */
+.el-select,
+.el-input,
+.el-textarea,
+.el-cascader {
+  max-width: 280px;
+  font-size: 14px;
+  /* height: 28px; */
+  line-height: 28px;
+  width: 100%;
+}
+
+/* 时间选择器 */
+.el-date-editor.el-input,
+.el-date-editor.el-input__inner {
+  width: 100%;
+}
+
+.el-date-editor.el-input__inner {
+  width: auto;
+}
+
+.el-date-editor .el-input {
+  max-width: 280px;
+  font-size: 14px
+}
+
+/* 时间选择器->时间段选择 */
+.el-range-editor.el-input__inner {
+  padding: 0px 5px;
+}
+
+.el-range-editor--medium.el-input__inner {
+  height: 28px;
+}
+
+.el-input__inner {
+  height: 28px;
+  line-height: 28px;
+}
+
+.el-input--medium .el-input__inner {
+  height: 28px;
+  line-height: 28px;
+}
+
+/* icon */
+.el-input__icon {
+  line-height: 28px;
+}
+
+.el-input--medium .el-input__icon {
+  line-height: 28px;
+}
+
+/* 触发后弹出的框,如下拉 */
+.el-popper {
+  max-width: 100%;
+}
+
+/* =============================================== form表单 */
+.el-form {
+  overflow: hidden;
+}
+
+.el-form-item {
+  margin-bottom: 0px;
+}
+
+/* =============================================== medium恢复 */
+.medium-regain .el-select,
+.medium-regain .el-input,
+.medium-regain .el-textarea {
+  max-width: 100%;
+  /* font-size: 14px; */
+  /* height: 28px; */
+  /* line-height: 28px; */
+  /* width: 100%; */
+}
+
+/* 表单 */
+.medium-regain .el-form-item {
+  margin-bottom: 22px;
+}
+
+/* 输入框 */
+.medium-regain .el-input__inner {
+  height: 36px;
+  line-height: 36px;
+}
+
+/* 按钮 */
+.medium-regain .el-button {
+  padding: 10px 20px;
+}
+
+.row-regain {
+  margin-bottom: 0px
+}
+
+/* =============================================== 超链接 (单号)*/
+.a-click-hover {
+  text-decoration: underline;
+  cursor: pointer;
+  color: #45c2b5 !important;
+}
+
+/* =============================================== 字体图标 */
+
+.iconfont {
+  font-size: 14px;
+  margin-right: 3px;
+}
+
+.el-button.is-circle span>.iconfont {
+  margin: 0
+}
+
+/* =============================================== 图片 */
+.imglist {
+  cursor: pointer;
+  width: 100px;
+}
+
+.imglistPopover {
+  max-width: 600px;
+}
+
+/* =============================================== 单张图片/文件上传,样式 */
+.el-upload {
+  border: 1px dashed #d9d9d9;
+}
+
+/* 是否组合产品 */
+.isCombine {
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #7b7bf2;
+  color: white;
+}
+
+/* =============================================== input基础多选样式 */
+.el-select.el-select--medium {
+  height: auto !important;
+}
+
+
+.el-table--enable-row-hover .el-table__body tr:hover>td {
+  /* background-color: #f5f7fa; */
+  /* background-color: rgb(232, 247, 246) */
+}
+
+/* Badge 标记 */
+.el-badge__content.is-fixed {
+  right: 3px
+}
+
+.grid-content-right {
+  float: right;
+}
+
+/* 提示小图标 */
+.form-item-row {
+  display: flex;
+  justify-content: flex-start;
+  flex-flow: row nowrap;
+  align-items: center;
+  margin-top: 5px;
+}
+
+/* 表格合计行样式 */
+.el-table__footer-wrapper {
+  font-weight: bolder
+}
+
+/*右浮动*/
+.fr {
+  float: right;
+}
+.fl {
+  float: left;
+}
+
+.mt-5 {
+  margin-top: 5px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mb-5 {
+  margin-bottom: 5px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.mg-15-50 {
+  margin: 15px 50px;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

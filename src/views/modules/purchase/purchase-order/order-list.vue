@@ -313,18 +313,10 @@ export default {
   methods: {
     getPurchaseStatus () {
       // 采购业务状态
-      this.$http
-        .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-          params: {
-            dataDictKey: 'PO_INFO_BIZ_STATUS'
-          }
-        })
-        .then(({
-          data
-        }) => {
-          this.typeRadioList = data.fontMaps
-          this.typeRadioList.unshift({ key: '', value: '全部' })
-        })
+      this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'PO_INFO_BIZ_STATUS' } }).then(({ data }) => {
+        this.typeRadioList = data.fontMaps
+        this.typeRadioList.unshift({ key: '', value: '全部' })
+      })
     },
     // 展开行
     rowExpand (row) {
@@ -338,31 +330,11 @@ export default {
       }).then(({ data }) => {
         if (data && data.code === 0) {
           for (var i = 0; i < data.poInfoDto.poDetails.length; i++) {
-            this.$set(
-              data.poInfoDto.poDetails[i],
-              'nameCh',
-              data.poInfoDto.poDetails[i].prodBasicEntity.nameCh
-            )
-            this.$set(
-              data.poInfoDto.poDetails[i],
-              'imageUrl',
-              data.poInfoDto.poDetails[i].url
-            )
-            this.$set(
-              data.poInfoDto.poDetails[i],
-              'prodCode',
-              data.poInfoDto.poDetails[i].prodBasicEntity.code
-            )
-            this.$set(
-              data.poInfoDto.poDetails[i],
-              'unitName',
-              data.poInfoDto.poDetails[i].prodBasicEntity.dictUnitEntity.name
-            )
-            this.$set(
-              data.poInfoDto.poDetails[i],
-              'specifications',
-              data.poInfoDto.poDetails[i].prodBasicEntity.specifications
-            )
+            this.$set(data.poInfoDto.poDetails[i], 'nameCh', data.poInfoDto.poDetails[i].prodBasicEntity.nameCh)
+            this.$set(data.poInfoDto.poDetails[i], 'imageUrl', data.poInfoDto.poDetails[i].url)
+            this.$set(data.poInfoDto.poDetails[i], 'prodCode', data.poInfoDto.poDetails[i].prodBasicEntity.code)
+            this.$set(data.poInfoDto.poDetails[i], 'unitName', data.poInfoDto.poDetails[i].prodBasicEntity.dictUnitEntity.name)
+            this.$set(data.poInfoDto.poDetails[i], 'specifications', data.poInfoDto.poDetails[i].prodBasicEntity.specifications)
           }
           this.$set(mainData, 'tableDataExpand', data.poInfoDto.poDetails)
         } else {
@@ -466,8 +438,7 @@ export default {
         dangerouslyUseHTMLString: true,
         cancelButtonText: '取消',
         type: 'warning'
-      }
-      ).then(() => {
+      }).then(() => {
         this.$http({
           url: this.$http.adornUrl('pur/poinfo/delete'),
           method: 'delete',
@@ -490,6 +461,7 @@ export default {
         })
       })
     },
+
     // 开始驻厂质检
     actionQuality: _.debounce(
       async function actionQuality (id) {
@@ -513,11 +485,11 @@ export default {
             })
           }
         })
-      },
-      1000,
-      { leading: true, trailing: false }
+      }, 1000, { leading: true, trailing: false }
     ),
+
     // ================================= table方法集 =======================================
+
     // 确认下单
     confirmOrder: _.debounce(
       async function confirmOrder (id) {
@@ -542,9 +514,7 @@ export default {
           }
           this.dataListLoading = false
         })
-      },
-      1000,
-      { leading: true, trailing: false }
+      }, 1000, { leading: true, trailing: false }
     ),
 
     // 采购付款
@@ -565,9 +535,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      { leading: true, trailing: false }
+      }, 1000, { leading: true, trailing: false }
     ),
 
     // 手工关闭
@@ -576,9 +544,7 @@ export default {
         this.$nextTick(() => {
           this.$refs.orderClose.init(id)
         })
-      },
-      1000,
-      { leading: true, trailing: false }
+      }, 1000, { leading: true, trailing: false }
     ),
 
     // 打印采购合同
@@ -610,9 +576,7 @@ export default {
         } else {
           console.log('没有hasTax参数')
         }
-      },
-      1000,
-      { leading: true, trailing: false }
+      }, 1000, { leading: true, trailing: false }
     ),
 
     // 下载
@@ -644,9 +608,7 @@ export default {
           }
           this.dataListLoading = false
         })
-      },
-      1000,
-      { leading: true, trailing: false }
+      }, 1000, { leading: true, trailing: false }
     ),
 
     // ==================== 过滤条件 =====================
@@ -673,6 +635,7 @@ export default {
       // this.filterableAllValue = value
       this.getDataList(1)
     },
+
     // 显示内部交易
     checkedChange (val) {
       this.getDataList(1)

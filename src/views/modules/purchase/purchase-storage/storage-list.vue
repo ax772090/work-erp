@@ -13,10 +13,10 @@
       </el-row>
     </el-form>
     <el-row>
-      <el-button v-if="isAuth('warehouse:whinstockpo:generatepayable')"
-                 type="primary"
-                 @click="addProPayment()"
-                 :disabled="isAddProPayment"><i class="iconfont erp-icon-xinzeng"></i>批量生成应付单</el-button>
+      <el-button type="primary"
+                 v-if="isAuth('warehouse:whinstockpo:generatepayable')"
+                 :disabled="isAddProPayment"
+                 @click="addProPayment()"><i class="iconfont erp-icon-xinzeng"></i>批量生成应付单</el-button>
     </el-row>
     <el-table stripe
               border
@@ -181,66 +181,56 @@ export default {
         value: '已撤销'
       }],
       // 下拉
-      searchOptions: [
-        {
-          label: '入库单号',
-          value: 'code',
-          inputType: 'el-input'
-        },
-        {
-          label: '采购订单号',
-          value: 'poCode',
-          inputType: 'el-input'
-        },
-        {
-          label: '采购合同号',
-          value: 'contractCode',
-          inputType: 'el-input'
-        },
-        {
-          label: '入库时间',
-          value: 'planDate,planDateEnd',
-          inputType: 'el-daterange'
-        },
-        {
-          label: '仓库',
-          value: 'warehouseId',
-          inputType: 'el-select',
-          httpUrl: '/list/combobox/warehouse',
-          dataSource: 'list',
-          title: 'warehouseName',
-          dataValue: 'id',
-          dataLabel: 'name',
-          placeholder: '仓库'
-        },
-        {
-          label: '产品名称',
-          value: 'prodName',
-          inputType: 'el-input'
-        },
-        {
-          label: '产品编码',
-          value: 'prodCode',
-          inputType: 'el-input'
-        },
-        {
-          label: '供应商名称',
-          value: 'supplierName',
-          inputType: 'el-input'
-        },
-        {
-          label: '单据状态',
-          value: 'status',
-          inputType: 'el-select',
-          httpUrl: 'basicData/queryDataDict2List',
-          requestParams: { dataDictKey: 'APPROVAL_STATUS' },
-          dataSource: 'fontMaps',
-          title: 'status',
-          dataValue: 'key',
-          dataLabel: 'value',
-          placeholder: '单据状态'
-        }
-      ],
+      searchOptions: [{
+        label: '入库单号',
+        value: 'code',
+        inputType: 'el-input'
+      }, {
+        label: '采购订单号',
+        value: 'poCode',
+        inputType: 'el-input'
+      }, {
+        label: '采购合同号',
+        value: 'contractCode',
+        inputType: 'el-input'
+      }, {
+        label: '入库时间',
+        value: 'planDate,planDateEnd',
+        inputType: 'el-daterange'
+      }, {
+        label: '仓库',
+        value: 'warehouseId',
+        inputType: 'el-select',
+        httpUrl: '/list/combobox/warehouse',
+        dataSource: 'list',
+        title: 'warehouseName',
+        dataValue: 'id',
+        dataLabel: 'name',
+        placeholder: '仓库'
+      }, {
+        label: '产品名称',
+        value: 'prodName',
+        inputType: 'el-input'
+      }, {
+        label: '产品编码',
+        value: 'prodCode',
+        inputType: 'el-input'
+      }, {
+        label: '供应商名称',
+        value: 'supplierName',
+        inputType: 'el-input'
+      }, {
+        label: '单据状态',
+        value: 'status',
+        inputType: 'el-select',
+        httpUrl: 'basicData/queryDataDict2List',
+        requestParams: { dataDictKey: 'APPROVAL_STATUS' },
+        dataSource: 'fontMaps',
+        title: 'status',
+        dataValue: 'key',
+        dataLabel: 'value',
+        placeholder: '单据状态'
+      }],
       // 是否禁用
       searchTF: true,
       // 时间过滤
@@ -287,11 +277,7 @@ export default {
         method: 'get'
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.$set(
-            mainData,
-            'tableDataExpand',
-            data.poInstockDto.poInstockDetail
-          )
+          this.$set(mainData, 'tableDataExpand', data.poInstockDto.poInstockDetail)
         } else {
           this.$notify.error({
             title: '错误',
@@ -433,9 +419,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -501,7 +485,7 @@ export default {
             this.$notify.success({
               dangerouslyUseHTMLString: true,
               title: '成功',
-              message: `${data.yfCodes.length <= 0 ? '已生成过应付单' : '生成的应付单号为: ' + data.yfCodes.join('</br>')}`,
+              message: `${data.yfCodes.length <= 0 ? '无法生成应付单，原因：1.已成功生成；2.不存在订单关联关系；' : '生成的应付单号为: ' + data.yfCodes.join('</br>')}`,
               duration: 5000
             })
           } else {

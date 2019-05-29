@@ -11,9 +11,13 @@
                           @resetHandle="resetHandle()"></erp-search-panel>
       </el-row>
       <el-row>
-        <el-button v-if="isAuth('warehouse:purchasewhreturnpo:save')"
-                   type="primary"
+        <el-button type="primary"
+                   v-if="isAuth('warehouse:purchasewhreturnpo:save')"
                    @click="editHandle('','canAdd')"><i class="iconfont erp-icon-xinzeng"></i>新增</el-button>
+        <el-button type="primary"
+                   v-if="isAuth('warehouse:whreturnpo:generatepayable')"
+                   :disabled="isAddProPayment"
+                   @click="addProPayment()"><i class="iconfont erp-icon-xinzeng"></i>批量生成应付单</el-button>
       </el-row>
     </el-form>
     <el-table stripe
@@ -23,6 +27,9 @@
               v-loading="dataListLoading"
               @expand-change="rowExpand"
               @selection-change="selectionChangeHandle">
+      <el-table-column type="selection"
+                       align="center"
+                       width="50"></el-table-column>
       <el-table-column type="expand"
                        label="展开"
                        width="50">
@@ -88,7 +95,7 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-if="isAuth('warehouse:whreturnpo:update')"
                                 command="update"
-                                :disabled="!(scope.row.status != statusOption[2].key)"
+                                :disabled="!(scope.row.status !== statusOption[2].key)"
                                 @click.native="editHandle(scope.row.id,'canEdit')">编辑</el-dropdown-item>
               <el-dropdown-item v-if="isAuth('warehouse:whreturnpo:confirm')"
                                 :disabled="!(scope.row.status === statusOption[0].key || scope.row.status === statusOption[3].key)"
@@ -105,6 +112,10 @@
               <el-dropdown-item v-if="isAuth('warehouse:whreturnpo:print')"
                                 command="delete"
                                 @click.native="print(scope.row.id)">打印</el-dropdown-item>
+              <el-dropdown-item command="print"
+                                v-if="isAuth('warehouse:whreturnpo:generatepayable')"
+                                :disabled="!(scope.row.status !== statusOption[2].key || scope.row.mode === 0)"
+                                @click.native="addProPayment(scope.row.id)">生成应付单号</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -160,88 +171,80 @@ export default {
         key: '04',
         value: '已撤销'
       }],
+
       // 搜索下拉
-      searchOptions: [
-        {
-          label: '退货单号',
-          value: 'code',
-          inputType: 'el-input'
-        },
-        {
-          label: '供应商',
-          value: 'supplierId',
-          inputType: 'el-select-remote',
-          httpUrl: 'basic/basicsupplier/list-used?b_used=true',
-          queryKey: 'name',
-          dataSource: 'list',
-          title: 'supplierIdList',
-          dataValue: 'id',
-          dataLabel: 'name',
-          placeholder: '供应商'
-        },
-        {
-          label: '退货日期',
-          value: 'planDate,planDateEnd',
-          inputType: 'el-daterange'
-        },
-        {
-          label: '产品名称',
-          value: 'prodName',
-          inputType: 'el-input'
-        },
-        {
-          label: '产品编码',
-          value: 'prodCode',
-          inputType: 'el-input'
-        },
-        {
-          label: '采购订单号',
-          value: 'poCode',
-          inputType: 'el-input'
-        },
-        {
-          label: '退货员',
-          value: 'userId',
-          inputType: 'el-select-remote',
+      searchOptions: [{
+        label: '退货单号',
+        value: 'code',
+        inputType: 'el-input'
+      }, {
+        label: '供应商',
+        value: 'supplierId',
+        inputType: 'el-select-remote',
+        httpUrl: 'basic/basicsupplier/list-used?b_used=true',
+        queryKey: 'name',
+        dataSource: 'list',
+        title: 'supplierIdList',
+        dataValue: 'id',
+        dataLabel: 'name',
+        placeholder: '供应商'
+      }, {
+        label: '退货日期',
+        value: 'planDate,planDateEnd',
+        inputType: 'el-daterange'
+      }, {
+        label: '产品名称',
+        value: 'prodName',
+        inputType: 'el-input'
+      }, {
+        label: '产品编码',
+        value: 'prodCode',
+        inputType: 'el-input'
+      }, {
+        label: '采购订单号',
+        value: 'poCode',
+        inputType: 'el-input'
+      }, {
+        label: '退货员',
+        value: 'userId',
+        inputType: 'el-select-remote',
 
-          httpUrl: '/list/search/user',
-          queryKey: 'name',
-          dataSource: 'list',
-          title: 'userId',
-          dataValue: 'id',
-          dataLabel: 'name',
-          placeholder: '退货员'
-        },
-        {
-          label: '退货仓库',
-          value: 'warehouseId',
-          inputType: 'el-select',
+        httpUrl: '/list/search/user',
+        queryKey: 'name',
+        dataSource: 'list',
+        title: 'userId',
+        dataValue: 'id',
+        dataLabel: 'name',
+        placeholder: '退货员'
+      }, {
+        label: '退货仓库',
+        value: 'warehouseId',
+        inputType: 'el-select',
 
-          httpUrl: 'list/combobox/warehouse',
-          dataSource: 'list',
-          title: 'warehouseIdList',
-          dataValue: 'id',
-          dataLabel: 'name',
-          placeholder: '退货仓库'
-        },
-        {
-          label: '单据状态',
-          value: 'status',
-          inputType: 'el-select',
+        httpUrl: 'list/combobox/warehouse',
+        dataSource: 'list',
+        title: 'warehouseIdList',
+        dataValue: 'id',
+        dataLabel: 'name',
+        placeholder: '退货仓库'
+      }, {
+        label: '单据状态',
+        value: 'status',
+        inputType: 'el-select',
 
-          httpUrl: 'basicData/queryDataDict2List',
-          requestParams: { dataDictKey: 'APPROVAL_STATUS' },
-          dataSource: 'fontMaps',
-          title: 'statusList',
-          dataValue: 'key',
-          dataLabel: 'value',
-          placeholder: '单据状态'
-        }
-      ],
+        httpUrl: 'basicData/queryDataDict2List',
+        requestParams: { dataDictKey: 'APPROVAL_STATUS' },
+        dataSource: 'fontMaps',
+        title: 'statusList',
+        dataValue: 'key',
+        dataLabel: 'value',
+        placeholder: '单据状态'
+      }],
       dataForm: {},
       dataList: [],
       dataListLoading: false,
       dataListSelections: [],
+      isAddProPayment: true,
       returnEdit: false,
       tableDataExpand: [] // 展开行
     }
@@ -263,11 +266,7 @@ export default {
         method: 'get'
       }).then(({ data }) => {
         if (data && data.code === 0) {
-          this.$set(
-            mainData,
-            'tableDataExpand',
-            data.poReturnDto.poReturnDetail
-          )
+          this.$set(mainData, 'tableDataExpand', data.poReturnDto.poReturnDetail)
         } else {
           this.$notify.error({
             title: '错误',
@@ -326,7 +325,7 @@ export default {
             this.getDataList()
             this.$notify.success({
               dangerouslyUseHTMLString: true,
-              message: `确认退货成功,编码为: ${data.entity.code}, </br> ${data.entity.yfCodes.length > 0 ? '成功生成采购应付单:' + data.entity.yfCodes.join('</br>') : ''} `,
+              message: `确认退货成功,编码为: ${data.entity.code}</br> ${data.entity.yfCodes.length > 0 ? '成功生成采购应付单:' + data.entity.yfCodes.join('</br>') : '无法生成应付单，原因：1.已成功生成；2.不存在订单关联关系；'} `,
               duration: 5000
             })
           } else {
@@ -338,9 +337,7 @@ export default {
           }
           this.dataListLoading = false
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -363,7 +360,7 @@ export default {
               this.getDataList()
               this.$notify.success({
                 dangerouslyUseHTMLString: true,
-                message: `撤销退货成功,/br>${data.entity.yfCodes.length > 0 ? '成功删除下游应付单:' + data.entity.yfCodes.join('</br>') : ''}`,
+                message: `撤销退货成功</br>${data.entity.yfCodes.length > 0 ? '成功删除下游应付单:' + data.entity.yfCodes.join('</br>') : ''}`,
                 duration: 5000
               })
             } else {
@@ -375,9 +372,7 @@ export default {
             }
           })
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -417,7 +412,7 @@ export default {
     // 打印
     print (id) {
       this.$http({
-        url: this.$http.adornUrl(`warehouse / whreturnpo / print / ${id}`),
+        url: this.$http.adornUrl(`warehouse/whreturnpo/print/${id}`),
         method: 'get'
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -435,9 +430,49 @@ export default {
       this.getDataList(1)
     },
 
+    // 生成应付单
+    addProPayment (id) {
+      var ids = id ? [id] : this.dataListSelections.map(item => { return item.id })
+      this.$confirm(`确定要${id ? '生成应付单' : '批量生成应付单'}吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('warehouse/whreturnpo/generatepayable'),
+          method: 'post',
+          data: this.$http.adornData(ids, false)
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.getDataList()
+            this.$notify.success({
+              dangerouslyUseHTMLString: true,
+              title: '成功',
+              message: `${data.yfCodes.length <= 0 ? '无法生成应付单，原因：1.已成功生成；2.不存在订单关联关系；' : '生成的应付单号为: ' + data.yfCodes.join('</br>')}`,
+              duration: 5000
+            })
+          } else {
+            this.$notify.error(data.msg)
+          }
+        })
+      })
+    },
+
     // 多选
     selectionChangeHandle (val) {
       this.dataListSelections = val
+      if (this.dataListSelections.length <= 0) {
+        this.isAddProPayment = true
+        return
+      } else {
+        this.isAddProPayment = false
+      }
+      for (const item of this.dataListSelections) {
+        // mode标识符: 是否是已收料再退货类型的单据
+        if (!(item.status === this.statusOption[2].key) || item.mode === 1) {
+          this.isAddProPayment = true
+        }
+      }
     }
   }
 }

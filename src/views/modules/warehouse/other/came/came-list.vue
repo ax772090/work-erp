@@ -380,9 +380,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -411,9 +409,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -431,9 +427,7 @@ export default {
             // this.dataForm = data.WhOutstockDto
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

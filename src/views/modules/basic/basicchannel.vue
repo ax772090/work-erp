@@ -105,6 +105,8 @@ import erpSearchPanel from '@/components/erp-search-panel'
 import paginationAll from '@/components/erp-pagination/pagination-all'
 import AddOrUpdate from './basicchannel-add-or-update'
 import { initData } from '@/mixins/initData.js'
+import { basicChannelList, basicChannelActiveOrDis } from '@/api/basic/basic.js'
+
 export default {
   mixins: [initData],
   components: {
@@ -161,23 +163,14 @@ export default {
         this.paginationData.currPage = val
       }
       this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('basic/basicchannel/list'),
-        method: 'get',
-        params: Object.assign(
-          {},
-          this.paginationData,
-          this.searchData === undefined ? {} : this.searchData
-        )
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.dataList = data.pageList.dataList
-          this.paginationData.totalCount = data.pageList.page.totalCount
-        } else {
-          this.dataList = []
-          this.paginationData.totalCount = 0
-        }
+      let requestData = Object.assign({}, this.paginationData, this.searchData === undefined ? {} : this.searchData)
+      basicChannelList(requestData).then((data) => {
+        this.dataList = data.pageList.dataList
+        this.paginationData.totalCount = data.pageList.page.totalCount
         this.dataListLoading = false
+      }).catch(() => {
+        this.dataList = []
+        this.paginationData.totalCount = 0
       })
     },
 
@@ -186,29 +179,20 @@ export default {
       this.dataListSelections = val
     },
 
-    // 禁用功能
+    // 禁用
     activeOrDis: _.debounce(
       async function activeOrDis (status) {
         let ListSelects = []
         for (let i = 0; i < this.dataListSelections.length; i++) {
           ListSelects.push(this.dataListSelections[i].id)
         }
-        this.$http({
-          url: this.$http.adornUrl('basic/basicchannel/activeOrDis/'),
-          method: 'post',
-          data: this.$http.adornData(
-            {
-              activeOrNot: status,
-              ids: ListSelects
-            },
-            false
-          )
-        }).then(({ data }) => {
+        basicChannelActiveOrDis({
+          activeOrNot: status,
+          ids: ListSelects
+        }).then((data) => {
           this.getDataList()
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

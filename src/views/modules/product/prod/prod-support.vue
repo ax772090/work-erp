@@ -12,39 +12,42 @@
                         prop="prodWeight"
                         :rules="dataRule.isWeight">
             <el-input v-model="dataForm.prodWeight"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
-           <el-form-item label="长度单位"
+          <el-form-item label="长度单位"
                         prop="prodUnit"
                         :rules="dataRule.isPositive">
-               <select-all
-                  v-model="dataForm.prodUnit"
-                  :listDataOption="prodUnitOption"
-                  data-value="key"
-                  data-label="value"
-                ></select-all>
+            <select-all v-model="dataForm.prodUnit"
+                        :listDataOption="prodUnitOption"
+                        data-value="key"
+                        data-label="value"></select-all>
           </el-form-item>
           <el-form-item label="长"
                         prop="prodLength"
                         :rules="dataRule.isPositive">
             <el-input v-model="dataForm.prodLength"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
           <el-form-item label="宽"
                         prop="prodWide"
                         :rules="dataRule.isPositive">
             <el-input v-model="dataForm.prodWide"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
           <el-form-item label="高"
                         prop="prodHeight"
                         :rules="dataRule.isPositive">
             <el-input v-model="dataForm.prodHeight"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
           <el-form-item label="体积"
                         prop="prodSize">
-            <el-input v-model="dataForm.prodSize" disabled></el-input>
+            <el-input v-model="dataForm.prodSize"
+                      disabled></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -53,39 +56,42 @@
                         prop="inboxWeight"
                         :rules="dataRule.isWeight">
             <el-input v-model="dataForm.inboxWeight"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
-           <el-form-item label="长度单位"
+          <el-form-item label="长度单位"
                         prop="inboxUnit"
                         :rules="dataRule.isPositive">
-             <select-all
-                  v-model="dataForm.inboxUnit"
-                  :listDataOption="prodUnitOption"
-                  data-value="key"
-                  data-label="value"
-                ></select-all>
+            <select-all v-model="dataForm.inboxUnit"
+                        :listDataOption="prodUnitOption"
+                        data-value="key"
+                        data-label="value"></select-all>
           </el-form-item>
           <el-form-item label="长"
                         prop="inboxLength"
                         :rules="dataRule.isPositive">
             <el-input v-model="dataForm.inboxLength"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
           <el-form-item label="宽"
                         prop="inboxWide"
                         :rules="dataRule.isPositive">
             <el-input v-model="dataForm.inboxWide"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
           <el-form-item label="高"
                         prop="inboxHeight"
                         :rules="dataRule.isPositive">
             <el-input v-model="dataForm.inboxHeight"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
           <el-form-item label="体积"
                         prop="inboxSize">
-            <el-input v-model="dataForm.inboxSize" disabled></el-input>
+            <el-input v-model="dataForm.inboxSize"
+                      disabled></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -96,47 +102,46 @@
                         :listDataOption="outboxUnitIdOptions"
                         data-value="id"
                         data-label="name"></select-all>
-            <!-- <el-select v-model="dataForm.outboxUnitId">
-              <el-option v-for="item in this.outboxUnitIdOptions"
-                         :key="item.id"
-                         :label="item.name"
-                         :value="item.id">
-              </el-option>
-            </el-select>-->
           </el-form-item>
           <el-form-item label="长(cm)"
                         prop="outboxLength"
                         :rules="dataRule.isPositive">
             <el-input v-model="dataForm.outboxLength"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
           <el-form-item label="宽(cm)"
                         prop="outboxWide"
                         :rules="dataRule.isPositive">
             <el-input v-model="dataForm.outboxWide"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
           <el-form-item label="高(cm)"
                         prop="outboxHeight"
                         :rules="dataRule.isPositive">
             <el-input v-model="dataForm.outboxHeight"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
           <el-form-item label="单箱体积(cm³)"
                         prop="outboxSize">
-            <el-input v-model="dataForm.outboxSize" disabled></el-input>
+            <el-input v-model="dataForm.outboxSize"
+                      disabled></el-input>
           </el-form-item>
           <el-form-item label="单箱重量(kg)"
                         prop="outboxWeight"
                         :rules="dataRule.isWeight">
             <el-input v-model="dataForm.outboxWeight"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
           <el-form-item label="单箱数量"
                         prop="outboxQty"
                         :rules="dataRule.isInteger">
             <el-input v-model="dataForm.outboxQty"
-                      type="Number"  @mousewheel.native.prevent></el-input>
+                      type="Number"
+                      @mousewheel.native.prevent></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -155,22 +160,11 @@ export default {
   data () {
     // 重量保留4位小数
     var validateDecimals = (rule, value, callback) => {
-      // let subString = rule.field.split('[')[1]
-      // let valueIndex = subString.split(']')[0]
-      // if (!this.dataForm.poDetails[valueIndex].bGifts) {
-        // 需大于0,保留两位小数
-        if (!/(^[0-9](\d+)?(\.\d{1,2})?$)|(^\d\.\d{1,4}$)/.test(value) && value != null) {
-          callback(new Error('需大于0,保留四位小数'))
-        } else {
-          callback()
-        }
-      // } else {
-      //   if (this.dataForm.poDetails[valueIndex].price != 0) {
-      //     callback(new Error('赠品单价为0'))
-      //   } else {
-      //     callback()
-      //   }
-      // }
+      if (!/(^[0-9](\d+)?(\.\d{1,2})?$)|(^\d\.\d{1,4}$)/.test(value) && value != null) {
+        callback(new Error('需大于0,保留四位小数'))
+      } else {
+        callback()
+      }
     }
     return {
       formDisabled: false,
@@ -257,7 +251,7 @@ export default {
 
   methods: {
     init (id, type, handleType, dataForm) { // 3
-     // 长度单位
+      // 长度单位
       this.$http
         .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
           params: { dataDictKey: 'PRODUCT_UNIT' }
@@ -337,13 +331,6 @@ export default {
     ),
 
     // // 校验
-    // validate (activeName) {
-    //   this.$refs['dataForm'].validate(valid => {
-    //     if (valid) {
-    //       this.$emit('nextStep', activeName)
-    //     }
-    //   })
-    // }
     validate () {
       return new Promise((resolve, reject) => {
         this.$refs['dataForm'].validate(valid => {
@@ -360,7 +347,7 @@ export default {
     value: {
       handler (val, oldVal) {
         this.dataForm = this.value
-         // 动态计算体积
+        // 动态计算体积
         if (val.prodLength && val.prodWide && val.prodHeight) {
           val.prodSize = (val.prodLength * val.prodWide * val.prodHeight).toFixed(2)
         } else {
@@ -390,12 +377,10 @@ export default {
 }
 </script>
 <style scoped>
-
 .item {
   margin-bottom: 20px;
   margin-left: 20px;
   font-size: 20px;
   font-weight: 600;
 }
-
 </style>

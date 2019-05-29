@@ -436,7 +436,7 @@ export default {
                 this.$notify.success({
                   dangerouslyUseHTMLString: true,
                   title: '成功',
-                  message: `确认退货成功,编码为: ${data.entity.code} , </br> ${data.entity.yfCodes.length > 0 ? '成功生成采购应付单:' + data.entity.yfCodes.join('</br>') : ''} `,
+                  message: `确认退货成功,编码为: ${data.entity.code}</br> ${data.entity.yfCodes.length > 0 ? '成功生成采购应付单:' + data.entity.yfCodes.join('</br>') : ''} `,
                   duration: 5000
                 })
               } else {
@@ -449,9 +449,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -494,9 +492,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

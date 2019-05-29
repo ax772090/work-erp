@@ -49,7 +49,6 @@
                             data-label="name"
                             :isDisabled="isDisabled"></select-all>
               </el-form-item>
-
             </el-col>
             <el-col :span="6">
               <el-form-item label="采购订单号"
@@ -200,7 +199,6 @@
                           @mousewheel.native.prevent
                           :disabled="isDisabled"></el-input>
               </el-form-item>
-
             </el-col>
             <el-col :span="6">
               <el-form-item label="产品总金额:"
@@ -263,7 +261,6 @@
                          label="产品图片">
           <template slot-scope="scope">
             <tableImg :imageUrl='scope.row.imageUrl'></tableImg>
-
           </template>
         </el-table-column>
         <el-table-column prop="prodCode"
@@ -577,34 +574,13 @@ export default {
   },
   created () {
     // 采购公司
-    this.$http
-      .get(this.$http.adornUrl('sys/organization/select'))
-      .then(({ data }) => {
-        this.compIdOption = data.companyList
-      })
+    this.$http.get(this.$http.adornUrl('sys/organization/select')).then(({ data }) => { this.compIdOption = data.companyList })
     // 业务状态
-    this.$http
-      .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-        params: { dataDictKey: 'PO_INFO_BIZ_STATUS' }
-      })
-      .then(({ data }) => {
-        this.dictBizStatusOption = data.fontMaps
-      })
+    this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'PO_INFO_BIZ_STATUS' } }).then(({ data }) => { this.dictBizStatusOption = data.fontMaps })
     // 运输方式
-    this.$http
-      .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-        params: { dataDictKey: 'TRANSPORT_MODE' }
-      })
-      .then(({ data }) => {
-        this.dictTransTypeOption = data.fontMaps
-      })
+    this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'TRANSPORT_MODE' } }).then(({ data }) => { this.dictTransTypeOption = data.fontMaps })
     // 结算币种
-    this.$http
-      .get(this.$http.adornUrl('dict/dictcurrency/listcombobox'))
-      .then(({ data }) => {
-        this.currencyOption = data.list
-        this.baseCurrencyIdOptions = data.list
-      })
+    this.$http.get(this.$http.adornUrl('dict/dictcurrency/listcombobox')).then(({ data }) => { this.currencyOption = data.list; this.baseCurrencyIdOptions = data.list })
   },
   methods: {
     // 选择结算币种
@@ -625,25 +601,9 @@ export default {
               this.dataForm.exchangeRate = data.exchangeRate
               this.$nextTick(() => {
                 for (let i = 0; i < this.dataForm.poDetails.length; i++) {
-                  if (
-                    this.dataForm.poDetails[i].price &&
-                    this.dataForm.poDetails[i].qty
-                  ) {
-                    this.dataForm.poDetails[i].baseTotalAmount =
-                      Math.round(
-                        Number(this.dataForm.poDetails[i].price) *
-                        Number(this.dataForm.poDetails[i].qty) *
-                        Number(this.dataForm.exchangeRate) *
-                        100
-                      ) / 100
-                    this.dataForm.poDetails[i].baseNoTaxAmount =
-                      Math.round(
-                        ((Number(this.dataForm.poDetails[i].price) *
-                          Number(this.dataForm.poDetails[i].qty) *
-                          Number(this.dataForm.exchangeRate)) /
-                          (1 + Number(this.dataForm.poDetails[i].taxRate))) *
-                        100
-                      ) / 100
+                  if (this.dataForm.poDetails[i].price && this.dataForm.poDetails[i].qty) {
+                    this.dataForm.poDetails[i].baseTotalAmount = Math.round(Number(this.dataForm.poDetails[i].price) * Number(this.dataForm.poDetails[i].qty) * Number(this.dataForm.exchangeRate) * 100) / 100
+                    this.dataForm.poDetails[i].baseNoTaxAmount = Math.round(((Number(this.dataForm.poDetails[i].price) * Number(this.dataForm.poDetails[i].qty) * Number(this.dataForm.exchangeRate)) / (1 + Number(this.dataForm.poDetails[i].taxRate))) * 100) / 100
                   }
                 }
               })
@@ -681,26 +641,9 @@ export default {
             if (data && data.code === 0) {
               this.dataForm.exchangeRate = data.exchangeRate
               for (let i = 0; i < this.dataForm.poDetails.length; i++) {
-                if (
-                  this.dataForm.poDetails[i].price &&
-                  this.dataForm.poDetails[i].qty
-                ) {
-                  this.dataForm.poDetails[i].baseTotalAmount =
-                    Math.round(
-                      Number(this.dataForm.poDetails[i].price) *
-                      Number(this.dataForm.poDetails[i].qty) *
-                      Number(this.dataForm.exchangeRate) *
-                      100
-                    ) / 100
-                  this.dataForm.poDetails[i].baseNoTaxAmount =
-                    Math.round(
-                      ((Number(this.dataForm.poDetails[i].price) *
-                        Number(this.dataForm.poDetails[i].qty) *
-                        Number(this.dataForm.exchangeRate)) /
-                        (1 + Number(this.dataForm.poDetails[i].taxRate))) *
-                      100
-                    ) / 100
-                }
+                if (this.dataForm.poDetails[i].price && this.dataForm.poDetails[i].qty) {
+                  this.dataForm.poDetails[i].baseTotalAmount = Math.round(Number(this.dataForm.poDetails[i].price) * Number(this.dataForm.poDetails[i].qty) * Number(this.dataForm.exchangeRate) * 100) / 100
+                  this.dataForm.poDetails[i].baseNoTaxAmount = Math.round(((Number(this.dataForm.poDetails[i].price) * Number(this.dataForm.poDetails[i].qty) * Number(this.dataForm.exchangeRate)) / (1 + Number(this.dataForm.poDetails[i].taxRate))) * 100) / 100                }
               }
               // 失败
             } else {
@@ -741,12 +684,12 @@ export default {
       this.dataForm.baseCurrencyId = 'CNY' // 锁定成人民币
       this.visible = true
       // if (!this.dataForm.id) {
-        //   // 新增
+      //   // 新增
       //   this.selectchange = true
       // }
       // 新增
       if (type === 'canAdd') {
-         this.selectchange = true
+        this.selectchange = true
       }
       this.dataForm.id = id
       this.type = type
@@ -800,18 +743,8 @@ export default {
                 this.$set(item, 'nameCh', item.prodBasicEntity.nameCh)
                 this.$set(item, 'imageUrl', item.url)
                 this.$set(item, 'prodCode', item.prodBasicEntity.code)
-                this.$set(
-                  item,
-                  'unitName',
-                  !item.prodBasicEntity.dictUnitEntity
-                    ? ''
-                    : item.prodBasicEntity.dictUnitEntity.name
-                )
-                this.$set(
-                  item,
-                  'specifications',
-                  item.prodBasicEntity.specifications
-                )
+                this.$set(item, 'unitName', !item.prodBasicEntity.dictUnitEntity ? '' : item.prodBasicEntity.dictUnitEntity.name)
+                this.$set(item, 'specifications', item.prodBasicEntity.specifications)
               }
               this.dataForm = data.poInfoDto
               this.dataForm.baseCurrencyId = 'CNY' // 锁定成人民币
@@ -841,25 +774,13 @@ export default {
         amountNumber = 0
       }
       row.amount = amountNumber.toFixed(2)
-      let baseTotal =
-        Math.round(
-          Number(row.price) *
-          Number(row.qty) *
-          Number(this.dataForm.exchangeRate) *
-          100
-        ) / 100
+      let baseTotal = Math.round(Number(row.price) * Number(row.qty) * Number(this.dataForm.exchangeRate) * 100) / 100
       if (isNaN(baseTotal)) {
         baseTotal = 0
       }
       row.baseTotalAmount = baseTotal
       let baseNoTax =
-        Math.round(
-          ((Number(row.price) *
-            Number(row.qty) *
-            Number(this.dataForm.exchangeRate)) /
-            (1 + Number(row.taxRate))) *
-          100
-        ) / 100
+        Math.round(((Number(row.price) * Number(row.qty) * Number(this.dataForm.exchangeRate)) / (1 + Number(row.taxRate))) * 100) / 100
       if (isNaN(baseNoTax)) {
         baseNoTax = 0
       }
@@ -937,31 +858,11 @@ export default {
           for (let j = 0; j < list.length; j++) {
             for (let i = 0; i < data.mapList.length; i++) {
               if (data.mapList[i].prodId === list[j].id) {
-                this.$set(
-                  list[j],
-                  'adviceQty',
-                  data.mapList[i].adviceQty
-                )
-                this.$set(
-                  list[j],
-                  'purQty',
-                  data.mapList[i].purQty
-                )
-                this.$set(
-                  list[j],
-                  'stockQty',
-                  data.mapList[i].stockQty
-                )
-                this.$set(
-                  list[j],
-                  'price',
-                  data.mapList[i].price
-                )
-                this.$set(
-                  list[j],
-                  'taxRate',
-                  data.mapList[i].taxRate
-                )
+                this.$set(list[j], 'adviceQty', data.mapList[i].adviceQty)
+                this.$set(list[j], 'purQty', data.mapList[i].purQty)
+                this.$set(list[j], 'stockQty', data.mapList[i].stockQty)
+                this.$set(list[j], 'price', data.mapList[i].price)
+                this.$set(list[j], 'taxRate', data.mapList[i].taxRate)
               }
             }
           }
@@ -1185,9 +1086,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      { leading: true, trailing: false }
+      }, 1000, { leading: true, trailing: false }
     ),
 
     // 确认下单
@@ -1257,9 +1156,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

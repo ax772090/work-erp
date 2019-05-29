@@ -12,8 +12,8 @@
                     prop="dimension">
         <el-radio-group :disabled="isDisabled"
                         v-model="dataForm.dimension">
-          <el-radio label="01">全部生成一张盘点表</el-radio>
-          <el-radio label="02">每个仓库一张盘点表</el-radio>
+          <el-radio label="01">按库存状态分表</el-radio>
+          <el-radio label="02">按仓库+库存状态分表</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="库存公司"
@@ -153,9 +153,7 @@ export default {
       this.$nextTick(() => {
         if (this.dataForm.id) {
           this.$http({
-            url: this.$http.adornUrl(
-              `warehouse/whstocktakingplan/info/${this.dataForm.id}`
-            ),
+            url: this.$http.adornUrl(`warehouse/whstocktakingplan/info/${this.dataForm.id}`),
             method: 'get'
           }).then(({ data }) => {
             if (data && data.code === 0) {
@@ -163,9 +161,7 @@ export default {
               data.whStocktakingPlan.rangeConfig =
                 data.whStocktakingPlan.rangeConfig + ''
               if (data.whStocktakingPlan.categoryIds) {
-                this.categoryIds = data.levelPath.split(
-                  '.'
-                )
+                this.categoryIds = data.levelPath.split('.')
               }
               if (data.whStocktakingPlan.prodIds) {
                 this.prodIds = data.whStocktakingPlan.prodIds.split(',')
@@ -207,13 +203,7 @@ export default {
     },
     // 选择公司触发
     compIdChange (value) {
-      this.$http
-        .get(this.$http.adornUrl('list/combobox/warehouse-comp'), {
-          params: { compId: value }
-        })
-        .then(({ data }) => {
-          this.warehouseIdsOption = data.list
-        })
+      this.$http.get(this.$http.adornUrl('list/combobox/warehouse-comp'), { params: { compId: value } }).then(({ data }) => { this.warehouseIdsOption = data.list })
       this.dataForm.warehouseIds = ''
     },
 
@@ -263,9 +253,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -290,11 +278,7 @@ export default {
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(
-                `warehouse/whstocktakingplan/${
-                !this.dataForm.id ? 'save' : 'save'
-                }`
-              ),
+              url: this.$http.adornUrl(`warehouse/whstocktakingplan/${!this.dataForm.id ? 'save' : 'save'}`),
               method: !this.dataForm.id ? 'post' : 'post',
               data: this.dataForm
             }).then(({ data }) => {
@@ -316,9 +300,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

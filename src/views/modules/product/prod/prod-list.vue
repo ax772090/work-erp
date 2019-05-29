@@ -367,9 +367,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -399,9 +397,7 @@ export default {
     CopyHandle: _.debounce(
       async function CopyHandle (id) {
         this.$refs.prodCopy.init(id)
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

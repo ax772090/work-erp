@@ -256,9 +256,7 @@ export default {
         }
         this.$emit('selectAddArr', mapData)
         this.visible = false
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

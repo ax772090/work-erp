@@ -110,9 +110,6 @@
     <span slot="footer"
           class="dialog-footer">
       <el-button @click="cancel('dataForm')"><i class="iconfont erp-icon-quxiao"></i>取消</el-button>
-      <!-- <el-button v-if="(activeName != 'prodBasic' && !this.handleType)"
-                 type="primary"
-      @click="preStep()">上一步</el-button>-->
       <el-button v-if="(!dataForm.id && !this.handleType) || (this.handleType === 'copy')"
                  type="primary"
                  @click="nextStepValidate()">{{activeName == 'prodCerAccessory' ? '一键保存' : '下一步'}}</el-button>
@@ -241,9 +238,6 @@ export default {
         // 新方式
         cerList: []
 
-        // 少一个
-        // cerList: [],
-        // imageList: [],
       },
       // 提取数据的type
       refTypeArr: [],
@@ -360,26 +354,20 @@ export default {
         return true
       }
       let validatePromice = this.$refs[oldActiveName].validate()
-      validatePromice
-        .then(data => {
-          // this.beforeLeaveGetData()
-          return data
-        })
-        .catch(error => {
-          // this.beforeLeaveGetData()// 去掉这句可以解决报错去查一次的问题,加上则出现如果是导入数据,价格信息无数据的情况,就会导致每个数据都没有价格信息的情况
-          return error
-        })
+      validatePromice.then(data => {
+        // this.beforeLeaveGetData()
+        return data
+      }).catch(error => {
+        // this.beforeLeaveGetData()// 去掉这句可以解决报错去查一次的问题,加上则出现如果是导入数据,价格信息无数据的情况,就会导致每个数据都没有价格信息的情况
+        return error
+      })
       return validatePromice
     },
 
     // 上一步
     preStep () {
       for (let i = 0; i < this.tabnameArr.length; i++) {
-        if (
-          this.activeName.toLowerCase() === this.tabnameArr[i].toLowerCase() &&
-          i !== 0 &&
-          i < this.tabnameArr.length
-        ) {
+        if (this.activeName.toLowerCase() === this.tabnameArr[i].toLowerCase() && i !== 0 && i < this.tabnameArr.length) {
           this.activeName = this.tabnameArr[i - 1]
           this.triggerChildren(this.dataForm.id)
           return
@@ -391,32 +379,25 @@ export default {
     nextStepValidate () {
       this.$nextTick(() => {
         let validatePromice = this.$refs[this.activeName].validate()
-        validatePromice
-          .then(data => {
-            if (data) {
-              this.nextStep()
-            }
-          })
-          .catch(error => {
-            console.log('校验不通过', error)
-          })
+        validatePromice.then(data => {
+          if (data) {
+            this.nextStep()
+          }
+        }).catch(error => {
+          console.log('校验不通过', error)
+        })
         return validatePromice
       })
     },
 
     // 下一步
     nextStep () {
-      if (
-        !this.dataForm.id &&
-        this.activeName === this.tabnameArr[this.tabnameArr.length - 1]
-      ) {
+      if (!this.dataForm.id && this.activeName === this.tabnameArr[this.tabnameArr.length - 1]) {
         this.saveAllValidate()
         return
       }
       for (let j = 0; j < this.tabnameArr.length - 1; j++) {
-        if (
-          this.activeName.toLowerCase() === this.tabnameArr[j].toLowerCase()
-        ) {
+        if (this.activeName.toLowerCase() === this.tabnameArr[j].toLowerCase()) {
           this.activeName = this.tabnameArr[j + 1]
           this.triggerChildren(this.dataForm.id, this.handleType)
           let nextTab = this.tabnameArr[j + 1]

@@ -274,7 +274,7 @@ export default {
 
     // 导出
     Export () {
-      let SearchObj = Object.assign({}, this.searchObj)
+      let SearchObj = Object.assign({}, this.searchData)
       window.open(
         this.$http.tokens(
           'warehouse/whinstockpo/instockdetailexport',

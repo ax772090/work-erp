@@ -184,7 +184,9 @@
               <el-form-item label="FBAShipmentID"
                             prop="fbaShipmentId"
                             :rules="[{ required: false, message: '输入fbaShipmentId', trigger: 'change' }]">
-                <el-input v-model="dataForm.fbaShipmentId" placeholder="" :disabled="isDisableT02"></el-input>
+                <el-input v-model="dataForm.fbaShipmentId"
+                          placeholder=""
+                          :disabled="isDisableT02"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -482,7 +484,7 @@
           </el-table-column>
           <!-- 操作列 -->
           <el-table-column fixed="right"
-                           width="80"
+                           width="120"
                            label="操作">
             <template slot-scope="scope">
               <el-button type="danger"
@@ -499,6 +501,13 @@
                          @click="stockCheckHandle(scope,'1')">
                 <i class="iconfont erp-icon-chakan"></i>
               </el-button>
+              <el-button type="success"
+                         circle
+                         title="打印产品标签"
+                         v-if="isAuth('warehouse:whdeliveryplan:getSkuLabel')"
+                         @click="printProdLabel(scope.row)">
+                <i class="iconfont erp-icon-dayin"></i>
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -510,6 +519,8 @@
     <!-- 库存情况 -->
     <stock-check ref="stockCheckRef"
                  @continue='continueHandle'></stock-check>
+    <!-- 打印产品标签 -->
+    <print-prodlabel ref="prodlabel"></print-prodlabel>
     <span slot="footer"
           class="dialog-footer">
       <el-button @click="cancel('dataForm')"><i class="iconfont erp-icon-quxiao"></i>取消</el-button>
@@ -539,6 +550,8 @@ import { getUrl, dateFormatter, clearTaskId } from '@/utils'
 import textareaAll from '@/components/erp-input/textarea-all.vue'
 // 日期组件
 import datePickerAll from '@/components/erp-date/datePicker-all'
+// 打印产品标签
+import printProdlabel from './print-prod-label'
 export default {
   components: {
     selectSeach,
@@ -547,7 +560,8 @@ export default {
     addDetails,
     stockCheck,
     textareaAll,
-    datePickerAll
+    datePickerAll,
+    printProdlabel
   },
   data () {
     // 不包括0的正整数（并且不是必填）
@@ -1420,7 +1434,21 @@ export default {
       }, 1000, {
         leading: true,
         trailing: false
-      })
+      }),
+    // 打印产品标签
+    printProdLabel (row) {
+      if (!row.fbaShipmentId) {
+        this.$notify.warning({
+          title: '提示',
+          message: 'FBAshipment为空，获取不到箱唛信息，无法打印，请先登记FBAshipmentID!',
+          duration: 3000
+        })
+      } else {
+        this.$nextTick(() => {
+          this.$refs.prodlabel.init(row)
+        })
+      }
+    }
   }
 }
 </script>

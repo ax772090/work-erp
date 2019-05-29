@@ -1,4 +1,3 @@
-<!-- 采购申请单(list) -->
 <template>
   <div>
     <el-form :inline="true"
@@ -80,27 +79,27 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="addOrUpdateHandle"
                                 v-if="isAuth('fin:finpopayable:update')"
-                                :disabled="!((scope.row.dictDocStatus === dictDocStatusOption[0].key || scope.row.dictDocStatus === dictDocStatusOption[3].key) && scope.row.docType === docTypeOption[1].key)"
+                                :disabled="!(scope.row.dictDocStatus === dictDocStatusOption[0].key || scope.row.dictDocStatus === dictDocStatusOption[3].key)"
                                 @click.native="addOrUpdateHandle(scope.row.id, 'canEdit')">编辑</el-dropdown-item>
               <el-dropdown-item command="submitHandle"
                                 v-if="isAuth('fin:finpopayable:submit')"
-                                :disabled="!((scope.row.dictDocStatus === dictDocStatusOption[0].key || scope.row.dictDocStatus === dictDocStatusOption[3].key) && scope.row.docType === docTypeOption[1].key)"
+                                :disabled="!(scope.row.dictDocStatus === dictDocStatusOption[0].key || scope.row.dictDocStatus === dictDocStatusOption[3].key)"
                                 @click.native="submitHandle(scope.row.id)">提交</el-dropdown-item>
               <el-dropdown-item command="addOrUpdateHandle"
                                 v-if="isAuth('fin:finpopayable:approvaltemp')"
-                                :disabled="!(scope.row.dictDocStatus === dictDocStatusOption[1].key && scope.row.docType === docTypeOption[1].key)"
+                                :disabled="!(scope.row.dictDocStatus === dictDocStatusOption[1].key)"
                                 @click.native="addOrUpdateHandle(scope.row.id, 'canApproval', scope.row)">审核</el-dropdown-item>
               <el-dropdown-item command="revocationApproval"
                                 v-if="isAuth('fin:finpopayable:repealsapproval')"
-                                :disabled="!(scope.row.dictDocStatus === dictDocStatusOption[1].key && scope.row.docType === docTypeOption[1].key)"
+                                :disabled="!(scope.row.dictDocStatus === dictDocStatusOption[1].key)"
                                 @click.native="revocationApproval(scope.row.id, 'canRevocationApproval', scope.row)">撤回审核</el-dropdown-item>
               <el-dropdown-item command="revocationHander"
                                 v-if="isAuth('fin:finpopayable:revoke')"
-                                :disabled="!(scope.row.dictDocStatus === dictDocStatusOption[2].key && scope.row.docType === docTypeOption[1].key)"
+                                :disabled="!(scope.row.dictDocStatus === dictDocStatusOption[2].key)"
                                 @click.native="revocationHander(scope.row.id, 'canUndone', scope.row)">撤销</el-dropdown-item>
               <el-dropdown-item command="deleteHander"
                                 v-if="isAuth('fin:finpopayable:delete')"
-                                :disabled="!((scope.row.dictDocStatus === dictDocStatusOption[0].key || scope.row.dictDocStatus === dictDocStatusOption[3].key) && scope.row.docType === docTypeOption[1].key)"
+                                :disabled="!(scope.row.dictDocStatus === dictDocStatusOption[0].key || scope.row.dictDocStatus === dictDocStatusOption[3].key)"
                                 @click.native="deleteHander(scope.row.id)">删除</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -125,6 +124,7 @@
 </template>
 
 <script>
+// 应付单
 // 搜索
 import erpSearchPanel from '@/components/erp-search-panel'
 import tableHaederSearch from '@/components/list-table/table-haeder-search'
@@ -438,14 +438,15 @@ export default {
 
     // 审批详情
     approveDetailHandle (id, row) {
-      if (row.docType === this.docTypeOption[0].key) {
-        this.$notify.error({
-          title: '提示',
-          message: '应付单没有审批流程',
-          duration: 5000
-        })
-        return
-      }
+      // console.log(row)
+      // if (row.docType === this.docTypeOption[0].key) {
+      //   this.$notify.error({
+      //     title: '提示',
+      //     message: '应付单没有审批流程',
+      //     duration: 5000
+      //   })
+      //   return
+      // }
       this.approvalDetaileVisible = true
       this.$nextTick(() => {
         this.$refs.approvalDetaile.init(id, row)

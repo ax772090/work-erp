@@ -209,7 +209,7 @@ export default {
       })
       // 销售平台
       this.queryDataDict2List('PLANTFORM_TYPE')
-      if (id === undefined) {
+      if (id === '') {
         this.dataForm.shippingMethod = '02'
         this.prodDataList = []
         // 渠道来源

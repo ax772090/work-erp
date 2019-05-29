@@ -171,8 +171,8 @@
           </el-form-item>
           <el-form-item label="结算方式"
                         prop="settleMode">
-            <el-input v-model="dataForm.settleMode"
-                      :disabled="isCheck || isApproval"></el-input>
+            <textarea-all v-model="dataForm.settleMode"
+                      :disabled="isCheck || isApproval"></textarea-all>
           </el-form-item>
           <el-form-item label="付款用途"
                         prop="remarks">

@@ -647,16 +647,9 @@ export default {
           this.dataForm = data.poStockDto
           let details = data.poStockDto.poStockDetails
           for (let i = 0; i < details.length; i++) {
-            this.$set(
-              details[i],
-              'prodName',
-              details[i].prodBasicEntity.nameCh
-            )
-            this.$set(
-              details[i],
-              'prodCode',
-              details[i].prodBasicEntity.code
-            )
+            this.$set(details[i], 'prodName', details[i].prodBasicEntity.nameCh)
+            this.$set(details[i], 'prodCode', details[i].prodBasicEntity.code)
+            this.$set(details[i], 'specifications', details[i].prodBasicEntity.specifications)
           }
         }
       })
@@ -667,20 +660,17 @@ export default {
         return
       }
       // 部门（新接口-级联）
-      this.$http.get(this.$http.adornUrl(`sys/organization/sortSpecifyNodeId`), { params: {
-          nodeId: item.compId
-        } })
-        .then(({ data }) => {
-          this.deptIdOption = data.list
-          // 对于‘查看’操作，这里直接拿数据库返回的levelPathArray，而不是拿查询返回的数据（新增，编辑用这种方式）
-          if (this.type === 'isDisabled') {
-            this.deptId = this.dataForm.sysOrganizationEntity.levelPathArray
-          } else {
-            let levelPathArray = deptCascader(data.list, item.deptId, 'subOrgList')
-            levelPathArray.splice(0, 2)
-            this.deptId = levelPathArray
-          }
-        })
+      this.$http.get(this.$http.adornUrl(`sys/organization/sortSpecifyNodeId`), { params: { nodeId: item.compId } }).then(({ data }) => {
+        this.deptIdOption = data.list
+        // 对于‘查看’操作，这里直接拿数据库返回的levelPathArray，而不是拿查询返回的数据（新增，编辑用这种方式）
+        if (this.type === 'isDisabled') {
+          this.deptId = this.dataForm.sysOrganizationEntity.levelPathArray
+        } else {
+          let levelPathArray = deptCascader(data.list, item.deptId, 'subOrgList')
+          levelPathArray.splice(0, 2)
+          this.deptId = levelPathArray
+        }
+      })
     },
 
     // 多选
@@ -751,7 +741,8 @@ export default {
           inventoryQty: '',
           allStock: '',
           leaderAdvice: '',
-          prodId: item.id
+          prodId: item.id,
+          specifications: item.specifications
         }
       })
       for (const data of list) {
@@ -904,9 +895,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -975,9 +964,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

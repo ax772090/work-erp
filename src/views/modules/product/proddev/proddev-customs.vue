@@ -80,6 +80,7 @@ export default {
   },
   data () {
     return {
+      isCheck: false,
       customsUnitIdOptions: [], // 报关单位
       currencyIdOptions: [], // 申报价值
       formDisabled: false,
@@ -110,11 +111,13 @@ export default {
   },
   methods: {
     init (id, type, handleType, row) {
+      this.isCheck = false
       this.rowList = row
       // this.$refs['dataForm'].clearValidate()
       // 5
       if (handleType === 'canCheck') {
         this.formDisabled = true
+        this.isCheck = true
       }
       // 审核
       if (handleType === 'canApproval') {
@@ -186,6 +189,10 @@ export default {
     // 校验
     validate () {
       return new Promise((resolve, reject) => {
+        if (this.isCheck) {
+          resolve(true)
+          return
+        }
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
             resolve(valid)

@@ -88,16 +88,8 @@ export default {
           }).then(({ data }) => {
             if (data && data.code === 0) {
               for (let i = 0; i < data.poInfoDto.poDetails.length; i++) {
-                this.$set(
-                  data.poInfoDto.poDetails[i],
-                  'code',
-                  data.poInfoDto.poDetails[i].prodBasicEntity.code
-                )
-                this.$set(
-                  data.poInfoDto.poDetails[i],
-                  'nameCh',
-                  data.poInfoDto.poDetails[i].prodBasicEntity.nameCh
-                )
+                this.$set(data.poInfoDto.poDetails[i], 'code', data.poInfoDto.poDetails[i].prodBasicEntity.code)
+                this.$set(data.poInfoDto.poDetails[i], 'nameCh', data.poInfoDto.poDetails[i].prodBasicEntity.nameCh)
                 this.$set(data.poInfoDto.poDetails[i], 'realityQty', 0)
               }
               this.dataForm = data.poInfoDto
@@ -151,9 +143,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

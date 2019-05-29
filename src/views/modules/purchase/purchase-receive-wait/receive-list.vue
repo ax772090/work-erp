@@ -483,7 +483,6 @@ export default {
     order (id) {
       this.$refs.storageEditor.init(id, 'isDisable')
     },
-
     // 全部
     dictInventoryAll (value) {
       // this.dictInventoryStatus = value
@@ -525,11 +524,7 @@ export default {
         }).then(({ data }) => {
           if (data && data.code === 0) {
             this.$nextTick(() => {
-              this.$refs.receiveRecordAddorupdate.init(
-                '',
-                'receiveList',
-                data.poReceiveDto
-              )
+              this.$refs.receiveRecordAddorupdate.init('', 'receiveList', data.poReceiveDto)
             })
           } else {
             this.$notify.error({
@@ -539,9 +534,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -562,11 +555,7 @@ export default {
         }).then(({ data }) => {
           if (data && data.code === 0) {
             this.$nextTick(() => {
-              this.$refs.storageEditor.init(
-                '',
-                'receiveList',
-                data.poInstockDto
-              )
+              this.$refs.storageEditor.init('', 'receiveList', data.poInstockDto)
             })
           } else {
             this.$notify.error({
@@ -576,9 +565,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -617,9 +604,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -655,9 +640,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -689,9 +672,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -727,9 +708,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -761,9 +740,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -799,9 +776,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -836,9 +811,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

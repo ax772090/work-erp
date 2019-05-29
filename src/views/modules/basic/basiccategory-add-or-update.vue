@@ -9,39 +9,36 @@
              ref="dataForm"
              label-width="110px">
       <el-row>
-        <el-col :span="24">
-          <el-form-item label="产品分类名称"
-                        prop="name">
-            <el-input v-model="dataForm.name"
-                      placeholder="产品分类名称"></el-input>
-          </el-form-item>
-          <el-form-item label="产品分类编码"
-                        prop="code">
-            <el-input v-model="dataForm.code"></el-input>
-          </el-form-item>
-          <el-form-item label="上级分类"
-                        prop="parentId">
-            <el-cascader v-model="parentId"
-                         :options="parentIdOptions"
-                         :props="{value: 'id', label: 'name', children: 'subCategoryNode'}"
-                         change-on-select
-                         clearable
-                         filterable></el-cascader>
-          </el-form-item>
-          <el-form-item label="备注"
-                        prop="remarks">
-            <textarea-all v-model="dataForm.remarks"></textarea-all>
-          </el-form-item>
-          <el-form-item label="状态"
-                        size="mini"
-                        prop="bUsed">
-            <el-radio-group v-model="dataForm.bUsed">
-              <el-radio :label="false">禁用</el-radio>
-              <el-radio :label="true">正常</el-radio>
-            </el-radio-group>
-          </el-form-item>
-
-        </el-col>
+        <el-form-item label="产品分类名称"
+                      prop="name">
+          <el-input v-model="dataForm.name"
+                    placeholder="产品分类名称"></el-input>
+        </el-form-item>
+        <el-form-item label="产品分类编码"
+                      prop="code">
+          <el-input v-model="dataForm.code"></el-input>
+        </el-form-item>
+        <el-form-item label="上级分类"
+                      prop="parentId">
+          <el-cascader v-model="parentId"
+                       :options="parentIdOptions"
+                       :props="{value: 'id', label: 'name', children: 'subCategoryNode'}"
+                       change-on-select
+                       clearable
+                       filterable></el-cascader>
+        </el-form-item>
+        <el-form-item label="备注"
+                      prop="remarks">
+          <textarea-all v-model="dataForm.remarks"></textarea-all>
+        </el-form-item>
+        <el-form-item label="状态"
+                      size="mini"
+                      prop="bUsed">
+          <el-radio-group v-model="dataForm.bUsed">
+            <el-radio :label="false">禁用</el-radio>
+            <el-radio :label="true">正常</el-radio>
+          </el-radio-group>
+        </el-form-item>
       </el-row>
     </el-form>
     <span slot="footer"
@@ -57,6 +54,7 @@
 import selectAll from '@/components/erp-select/select-all'
 // 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
+import { basicCategoryInfo, basicCategoryTreeList, basicCategorySave, basicCategoryUpdate } from '@/api/basic/basic.js'
 export default {
   components: {
     selectAll,
@@ -86,19 +84,10 @@ export default {
     }
   },
   methods: {
-    // 拿到上级分类的数据
+    // 上级分类
     parentIdSelect () {
       var ids = !this.dataForm.id ? '' : this.dataForm.id
-      this.$http({
-        url: this.$http.adornUrl('basic/basiccategory/treeList'),
-        method: 'get',
-        params: this.$http.adornParams(
-          {
-            id: ids
-          },
-          false
-        )
-      }).then(({ data }) => {
+      basicCategoryTreeList({ id: ids }).then((data) => {
         this.parentIdOptions = data.treeList
       })
     },
@@ -110,21 +99,12 @@ export default {
       this.visible = true
       this.dataForm.id = id
       this.parentIdSelect()
-      // 当dom渲染完成回调nextTick
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(
-              `basic/basiccategory/info/${this.dataForm.id}`
-            ),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm = data.basicCategory
-              this.parentId = data.basicCategory.levelPathNode
-            }
+          basicCategoryInfo(this.dataForm.id, true).then((data) => {
+            this.dataForm = data.basicCategory
+            this.parentId = data.basicCategory.levelPathNode
           })
         }
       })
@@ -137,14 +117,8 @@ export default {
         }
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(
-                `basic/basiccategory/${!this.dataForm.id ? 'save' : 'update'}`
-              ),
-              method: !this.dataForm.id ? 'post' : 'put',
-              data: this.$http.adornData(this.dataForm, false)
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
+            if (this.dataForm.id) {
+              basicCategoryUpdate(this.dataForm).then((data) => {
                 this.$emit('refreshDataList')
                 this.visible = false
                 this.$notify.success({
@@ -152,19 +126,34 @@ export default {
                   message: '操作成功',
                   duration: 1500
                 })
-              } else {
+              }).catch((error) => {
                 this.$notify.error({
                   title: '错误',
-                  message: data.msg,
+                  message: error.msg,
                   duration: 5000
                 })
-              }
-            })
+              })
+            }
+            if (!this.dataForm.id) {
+              basicCategorySave(this.dataForm).then((data) => {
+                this.$emit('refreshDataList')
+                this.visible = false
+                this.$notify.success({
+                  title: '成功',
+                  message: '操作成功',
+                  duration: 1500
+                })
+              }).catch((error) => {
+                this.$notify.error({
+                  title: '错误',
+                  message: error.msg,
+                  duration: 5000
+                })
+              })
+            }
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

@@ -183,6 +183,7 @@ export default {
   },
   data () {
     return {
+      isCheck: false,
       brandIdOption: [], // 品牌
       unitIdOption: [], // 产品单位
       formDisabled: false,
@@ -274,25 +275,9 @@ export default {
   },
   created () {
     // 销售国家
-    this.$http
-      .get(this.$http.adornUrl('dict/dictcountry/listcombobox'))
-      .then(({ data }) => {
-        this.saleCountryIdOptions = data.list
-      })
-    this.$http
-      .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-        params: { dataDictKey: 'SALE_STATUS' }
-      })
-      .then(({ data }) => {
-        this.dictSaleStatusOptions = data.fontMaps
-      })
-    this.$http
-      .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-        params: { dataDictKey: 'PRODUCT_PROPERTIES' }
-      })
-      .then(({ data }) => {
-        this.dictProductPropertiesOption = data.fontMaps
-      })
+    this.$http.get(this.$http.adornUrl('dict/dictcountry/listcombobox')).then(({ data }) => { this.saleCountryIdOptions = data.list })
+    this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'SALE_STATUS' } }).then(({ data }) => { this.dictSaleStatusOptions = data.fontMaps })
+    this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'PRODUCT_PROPERTIES' } }).then(({ data }) => { this.dictProductPropertiesOption = data.fontMaps })
     // 品牌
     this.$http.get(this.$http.adornUrl('basic/basicbrand/listcombobox')).then(({ data }) => { this.brandIdOption = data.list })
     // 产品单位
@@ -333,16 +318,21 @@ export default {
       this.dataForm.updTime = ''
       this.dataForm.updUser = ''
 
+      this.isCheck = false
       this.dataForm.prodId = id
       this.type = type
       this.copyType = ''
       this.parentIdSelect()
+
       // 新增
       if (!this.dataForm.prodId) {
         this.dataForm.devUserId = sessionStorage.getItem('userId')
       }
+
+      // 查看
       if (handleType === '1') {
         this.formDisabled = true
+        this.isCheck = true
       } else if (handleType === 'copy') {
         this.dataForm = dataForm.prodBasicEntity
         this.copyType = dataForm.prodBasicEntity.copiedType
@@ -351,18 +341,14 @@ export default {
         if (isNull(dataForm.prodBasicEntity.infringement)) {
           this.isInfringement = true
           this.$nextTick(() => {
-            this.infringementArr = dataForm.prodBasicEntity.infringement.split(
-              ','
-            )
+            this.infringementArr = dataForm.prodBasicEntity.infringement.split(',')
           })
         }
       }
       this.$nextTick(() => {
         if (this.dataForm.prodId) {
           this.$http({
-            url: this.$http.adornUrl(
-              `prod/prodbasic/info/${this.dataForm.prodId}/${this.type}`
-            ),
+            url: this.$http.adornUrl(`prod/prodbasic/info/${this.dataForm.prodId}/${this.type}`),
             method: 'get',
             params: this.$http.adornParams({}, false)
           }).then(({ data }) => {
@@ -373,9 +359,7 @@ export default {
               if (isNull(data.prodBasicEntity.infringement)) {
                 this.isInfringement = true
                 this.$nextTick(() => {
-                  this.infringementArr = data.prodBasicEntity.infringement.split(
-                    ','
-                  )
+                  this.infringementArr = data.prodBasicEntity.infringement.split(',')
                 })
               }
             } else {
@@ -407,11 +391,10 @@ export default {
 
     // 清除是否侵权数据
     infringementOptionChange (val) {
-      // if (val) {
       this.dataForm.infringementArr = []
       this.dataForm.infringement = ''
-      // }
     },
+
     dataFormSubmitValidate (id, type) {
       this.$http({
         url: this.$http.adornUrl('prod/prodbasic/update'),
@@ -436,6 +419,7 @@ export default {
         }
       })
     },
+
     // 表单提交
     dataFormSubmit: _.debounce(
       async function dataFormSubmit (id, type) {
@@ -466,9 +450,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -477,6 +459,10 @@ export default {
     // 校验
     validate () {
       return new Promise((resolve, reject) => {
+        if (this.isCheck) {
+          resolve(true)
+          return
+        }
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
             resolve(valid)

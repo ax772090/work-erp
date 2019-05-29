@@ -28,11 +28,9 @@
                         data-label="value"></select-all>
           </el-form-item>
           <el-form-item label="备注"
-                        prop="remarks"
-                        ref="againValue"
-                        :rules="dataRule.isRequired">
+                        prop="remarks">
             <textarea-all v-model="dataForm.remarks"
-                          :disabled="isCheck || isApproval"></textarea-all>
+                          :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[0].key"></textarea-all>
           </el-form-item>
 
         </el-col>
@@ -44,7 +42,7 @@
                             type="date"
                             format="yyyy-MM-dd"
                             value-format="yyyy-MM-dd"
-                            :disabled="isCheck || isApproval"></el-date-picker>
+                            :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[0].key"></el-date-picker>
           </el-form-item>
           <el-form-item label="供应商"
                         :rules="dataRule.isRequired"
@@ -115,7 +113,7 @@
       <!-- ============================== 应付单 ============================= -->
       <div>
         <el-button type="text"
-                   v-if="!(isCheck ||isApproval)"
+                   v-if="!(isCheck ||isApproval ||  dataForm.docType === docTypeOption[0].key)"
                    :disabled="isCheck"
                    @click="detailAddHandle()">
           <i class="iconfont erp-icon-tianjiamingxi"></i>添加明细行</el-button>
@@ -147,38 +145,68 @@
                            width="50px"></el-table-column>
           <el-table-column label="数量"
                            prop="qty"
-                           width="50px"></el-table-column>
+                           min-width="30px">
+
+          </el-table-column>
           <el-table-column label="单价"
                            prop="price"
-                           width="100px"></el-table-column>
+                           min-width="30px">
+            <template slot-scope="scope">
+              <el-input v-model.number="scope.row.price"
+                        type="Number"
+                        @input="priceHander(scope.row)"
+                        @mousewheel.native.prevent
+                        :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[1].key"></el-input>
+            </template>
+          </el-table-column>
           <el-table-column label="税率"
                            prop="taxRate"
-                           width="50px"></el-table-column>
+                           min-width="30px">
+            <template slot-scope="scope">
+              <el-input v-model.number="scope.row.taxRate"
+                        type="Number"
+                        @input="taxRateHander(scope.row)"
+                        @mousewheel.native.prevent
+                        :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[1].key"></el-input>
+            </template>
+          </el-table-column>
           <el-table-column label="不含税金额"
                            prop="noTaxAmount"
-                           width="100px"></el-table-column>
+                           width="100px"> </el-table-column>
           <el-table-column label="税额"
                            prop="taxAmount"
-                           width="50px">
-          </el-table-column>
+                           min-width="20px"> </el-table-column>
           <el-table-column label="汇率"
                            prop="exchangeRate"
-                           width="50px"></el-table-column>
-          <el-table-column label="总金额"
+                           min-width="20px"></el-table-column>
+          <el-table-column :label="dataForm.docType === docTypeOption[1].key ? '调整金额' : '总金额'"
                            prop="totalAmount"
-                           width="120px">
+                           min-width="30px">
             <template slot-scope="scope">
               <el-form-item :prop="'finPoPayableDetailList[' + scope.$index + '].totalAmount'"
                             :rules="dataRule.totalAmount"
                             label-width="0px">
-                <el-input v-model="scope.row.totalAmount"
+                <el-input v-model.number="scope.row.totalAmount"
                           type="Number"
+                          @input="totalAmountHander(scope.row)"
                           @mousewheel.native.prevent
-                          :disabled="isCheck || isApproval"></el-input>
+                          :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[0].key"></el-input>
               </el-form-item>
             </template>
           </el-table-column>
-          <el-table-column v-if="!(isCheck || isApproval)"
+          <el-table-column label="调整原因"
+                           prop="remark"
+                           min-width="50px">
+            <template slot-scope="scope">
+              <el-form-item :prop="'finPoPayableDetailList[' + scope.$index + '].remark'"
+                            :rules="dataForm.docType === docTypeOption[1].key ? dataRule.isRequired : dataRule.isNO"
+                            label-width="0px">
+                <textarea-all v-model="scope.row.remark"
+                              :disabled="isCheck || isApproval"></textarea-all>
+              </el-form-item>
+            </template>
+          </el-table-column>
+          <el-table-column v-if="!(isCheck || isApproval || dataForm.docType === docTypeOption[0].key)"
                            width="80"
                            fixed="right"
                            label="操作">
@@ -280,6 +308,13 @@ export default {
       // 多选情况
       dataListSelections: [],
       approvalData: {},
+      docTypeOption: [{
+        key: '01',
+        value: '应付单'
+      }, {
+        key: '02',
+        value: '应付调整单'
+      }],
       dictDocStatusOption: [{
         key: '01',
         value: '未审核'
@@ -470,14 +505,11 @@ export default {
         return
       }
       this.$nextTick(() => {
-        this.$refs.addDetails.init(
-          this.dataForm.id,
-          this.dataForm.finPoPayableDetailList,
-          {
-            supplierId: this.dataForm.supplierId,
-            compId: this.dataForm.compId,
-            currencyId: this.dataForm.currencyId
-          }
+        this.$refs.addDetails.init(this.dataForm.id, this.dataForm.finPoPayableDetailList, {
+          supplierId: this.dataForm.supplierId,
+          compId: this.dataForm.compId,
+          currencyId: this.dataForm.currencyId
+        }
         )
       })
     },
@@ -503,8 +535,7 @@ export default {
               if (data && data.code === 0) {
                 this.visible = false
                 this.$emit('refreshDataList')
-                this.$notify({
-                  type: 'success',
+                this.$notify.success({
                   title: '提示',
                   message: `${!this.dataForm.id ? '新增' : '修改'}成功, 编码为:${data.entity.code}`,
                   duration: 5000
@@ -673,6 +704,28 @@ export default {
         trailing: false
       }),
 
+    // 单价
+    priceHander (row) {
+      row.totalAmount = (row.qty * row.price).toFixed(2)
+      row.noTaxAmount = (row.qty * row.price / (1 + Number(row.taxRate))).toFixed(2)
+    },
+
+    // 税率
+    taxRateHander (row) {
+      console.log(1 + row.taxRate)
+      row.totalAmount = (row.qty * row.price).toFixed(2)
+      row.noTaxAmount = (row.qty * row.price / (1 + Number(row.taxRate))).toFixed(2)
+      row.taxAmount = (row.totalAmount - row.noTaxAmount).toFixed(2)
+    },
+
+    // 总金额
+    totalAmountHander (row) {
+      if (this.dataForm.docType === this.docTypeOption[1].key) {
+        row.noTaxAmount = row.totalAmount.toFixed(2)
+      }
+      // row.noTaxAmount = (row.qty * row.price / (1 + Number(row.taxRate))).toFixed(2)
+    },
+
     // 子组件添加的数据
     addList (list) {
       for (const data of list) {
@@ -682,6 +735,11 @@ export default {
             isFind = true
             break
           }
+        }
+        // 针对应付调整单的数据操作=>逻辑需确立在类型为应付调整单的前提之下
+        if (this.dataForm.docType === this.docTypeOption[1].key) {
+          data.taxAmount = 0
+          data.noTaxAmount = data.totalAmount
         }
         if (!isFind) {
           this.dataForm.finPoPayableDetailList.push(data)

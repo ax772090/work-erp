@@ -309,18 +309,18 @@ export default {
           for (const item of data.dataList) {
             let itemTemp = this.amountFixed2(item)
             this.$set(itemTemp, 'refundQtyPer', Number(itemTemp.shipment_quantity) === 0 ? 0 : ((Number(itemTemp.refund_quantity) / Number(itemTemp.shipment_quantity)) * 100).toFixed(2))
-            this.$set(itemTemp, 'grossPer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.gross_profit) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            this.$set(itemTemp, 'refundAmountPer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.refund_amount) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            this.$set(itemTemp, 'purchasePer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.purchase_amount) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            this.$set(itemTemp, 'freightPer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.freight_amount) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            // this.$set(itemTemp, 'promotionPer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.promotion_amount) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            this.$set(itemTemp, 'fbaPer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.fba_amount) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            this.$set(itemTemp, 'sellerfeePer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.seller_fees_amount) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            this.$set(itemTemp, 'otherPer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.others_amount) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            this.$set(itemTemp, 'perservicePer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.per_service_fee) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            this.$set(itemTemp, 'perdealPer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.per_deal_fee) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            this.$set(itemTemp, 'perAdPer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.per_amz_ad_fee) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
-            this.$set(itemTemp, 'assessPer', Number(itemTemp.shipment_amount) === 0 ? 0 : ((Number(itemTemp.platform_assess_fee) / Number(itemTemp.shipment_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'grossPer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.gross_profit) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'refundAmountPer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.refund_amount) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'purchasePer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.purchase_amount) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'freightPer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.freight_amount) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            // this.$set(itemTemp, 'promotionPer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.promotion_amount) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'fbaPer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.fba_amount) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'sellerfeePer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.seller_fees_amount) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'otherPer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.others_amount) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'perservicePer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.per_service_fee) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'perdealPer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.per_deal_fee) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'perAdPer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.per_amz_ad_fee) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
+            this.$set(itemTemp, 'assessPer', Number(itemTemp.sell_amount) === 0 ? 0 : ((Number(itemTemp.platform_assess_fee) / Number(itemTemp.sell_amount)) * 100).toFixed(2))
           }
           this.dataList = data.dataList
         } else {
@@ -433,12 +433,12 @@ export default {
       this.sumDateRangeHandle(val)
     },
     headerCellStyle (data) {
-      if (data.columnIndex === 6) {
+      if (data.columnIndex === 5) {
         return 'color:#e4a421'
       }
     },
     cellStyle (data) {
-      if (data.columnIndex === 6) {
+      if (data.columnIndex === 5) {
         return 'color:#e4a421'
       }
     },
@@ -450,10 +450,11 @@ export default {
     getSummaries (param) {
       const { columns, data } = param
       // 这里单独计算出订单金额的总和，因为需求要去掉订单金额这一列
-      let temp = 0
-      data.forEach(item => {
-        temp += Number(item['shipment_amount'])
-      })
+      // 需求又变了
+      // let temp = 0
+      // data.forEach(item => {
+      //   temp += Number(item['shipment_amount'])
+      // })
 
       const sums = []
       columns.forEach((column, index) => {
@@ -485,7 +486,7 @@ export default {
           sums[index] = parseInt(sums[index]) + '\n' + '(' + ((sums[index] * 100 / sums[2] * 100) / 100).toFixed(2) + '%)'
         }
         if (index > 4) {
-          sums[index] = sums[index] + '\n' + '(' + ((sums[index] * 100 / Number(temp.toFixed(2)) * 100) / 100).toFixed(2) + '%)'
+          sums[index] = sums[index] + '\n' + '(' + ((sums[index] * 100 / sums[4] * 100) / 100).toFixed(2) + '%)'
         }
       })
 

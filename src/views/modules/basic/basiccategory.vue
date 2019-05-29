@@ -12,8 +12,7 @@
         <el-button v-if="isAuth('basic:basiccategory:save')"
                    type="primary"
                    @click="addOrUpdateHandle('','canAdd')">
-          <i class="iconfont erp-icon-xinzeng"></i>
-          新增
+          <i class="iconfont erp-icon-xinzeng"></i>新增
         </el-button>
         <el-button type="primary"
                    @click="activeOrDis(status=false)"
@@ -92,6 +91,7 @@ import erpSearchPanel from '@/components/erp-search-panel'
 import paginationAll from '@/components/erp-pagination/pagination-all'
 import AddOrUpdate from './basiccategory-add-or-update'
 import { initData } from '@/mixins/initData.js'
+import { basicCategoryList, basicCategoryActiveOrDis } from '@/api/basic/basic.js'
 export default {
   mixins: [initData],
   components: {
@@ -104,18 +104,15 @@ export default {
       // 数据过滤器
       searchData: {},
       // 下拉
-      searchOptions: [
-        {
-          label: '分类名称',
-          value: 'name',
-          inputType: 'el-input'
-        },
-        {
-          label: '分类上级',
-          value: 'parent_id',
-          inputType: 'el-input'
-        }
-      ],
+      searchOptions: [{
+        label: '分类名称',
+        value: 'name',
+        inputType: 'el-input'
+      }, {
+        label: '分类上级',
+        value: 'parent_id',
+        inputType: 'el-input'
+      }],
 
       // 是否禁用
       searchTF: true,
@@ -145,37 +142,25 @@ export default {
         for (let i = 0; i < this.dataListSelections.length; i++) {
           ListSelects.push(this.dataListSelections[i].id)
         }
-        this.$http({
-          url: this.$http.adornUrl('basic/basiccategory/activeOrDis/'),
-          method: 'post',
-          data: this.$http.adornData(
-            {
-              activeOrNot: status,
-              ids: ListSelects
-            },
-            false
-          )
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.$emit('refreshDataList')
-            this.visible = false
-            this.$notify.success({
-              title: '成功',
-              message: '操作成功',
-              duration: 1500
-            })
-          } else {
-            this.$notify.error({
-              title: '错误',
-              message: data.msg,
-              duration: 5000
-            })
-          }
+        basicCategoryActiveOrDis({
+          activeOrNot: status,
+          ids: ListSelects
+        }).then((data) => {
           this.getDataList()
+          this.visible = false
+          this.$notify.success({
+            title: '成功',
+            message: '操作成功',
+            duration: 5000
+          })
+        }).catch((data) => {
+          this.$notify.error({
+            title: '错误',
+            message: data.msg,
+            duration: 5000
+          })
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -187,22 +172,14 @@ export default {
         this.paginationData.currPage = val
       }
       this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('basic/basiccategory/list'),
-        method: 'get',
-        params:
-          this.searchData === undefined
-            ? this.paginationData
-            : Object.assign({}, this.paginationData, this.searchData)
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.dataList = data.pageList.dataList
-          this.paginationData.totalCount = data.pageList.page.totalCount
-        } else {
-          this.dataList = []
-          this.paginationData.totalCount = 0
-        }
+      let requestData = this.searchData === undefined ? this.paginationData : Object.assign({}, this.paginationData, this.searchData)
+      basicCategoryList(requestData).then(data => {
+        this.dataList = data.pageList.dataList
+        this.paginationData.totalCount = data.pageList.page.totalCount
         this.dataListLoading = false
+      }).catch(() => {
+        this.dataList = []
+        this.paginationData.totalCount = 0
       })
     },
     // 多选

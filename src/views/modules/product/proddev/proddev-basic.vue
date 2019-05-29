@@ -183,6 +183,7 @@ export default {
 
   data () {
     return {
+      isCheck: false,
       brandIdOption: [], // 品牌
       unitIdOption: [], // 产品单位
       dictProductResourceOption: [], // 产品来源
@@ -280,13 +281,16 @@ export default {
   methods: {
     init (id, type, handleType) {
       this.visible = true
+      this.isCheck = false
       this.dataForm.id = id
       this.type = type
       this.parentIdSelect()
       // 销售国家
       this.$http.get(this.$http.adornUrl('dict/dictcountry/listcombobox')).then(({ data }) => { this.saleCountryIdOptions = data.list })
       this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'PRODUCT_PROPERTIES' } }).then(({ data }) => { this.dictProductPropertiesOption = data.fontMaps })
+      // 查看
       if (handleType === 'canCheck') {
+        this.isCheck = true
         this.formDisabled = true
       }
       // 审核
@@ -500,6 +504,10 @@ export default {
     // 校验
     validate () {
       return new Promise((resolve, reject) => {
+        if (this.isCheck) {
+          resolve(true)
+          return
+        }
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
             resolve(valid)

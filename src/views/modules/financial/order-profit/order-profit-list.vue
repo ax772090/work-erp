@@ -28,6 +28,7 @@
                    type="primary">重算</el-button>
         <el-button @click="pigeonhole()"
                    class="fl"
+                   v-if="isAuth('fin:finsettledata:file')"
                    type="primary">归档</el-button>
         <el-button @click="download()"
                    v-if="isAuth('fin:finsettledata:exportSettleData')"
@@ -43,11 +44,12 @@
               max-height="800"
               :header-cell-style='tableHeaderColor'
               :data="dataList"
-              @selection-change="selectionChangeHandle">
-      <el-table-column type="selection"
+              show-summary
+              :summary-method="getSummaries">
+      <!-- <el-table-column type="selection"
                        align="center"
                        width="50">
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column prop="settleMonth"
                        label="结算月份"></el-table-column>
       <el-table-column prop="settleTime"
@@ -377,6 +379,48 @@ export default {
     this.getDataUrl()
   },
   methods: {
+    getSummaries (param) {
+      const { columns, data } = param
+      const sums = []
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[index] = '合计'
+          return
+        }
+        const values = data.map(item => Number(item[column.property]))
+        if (!values.every(value => isNaN(value))) {
+          sums[index] = values.reduce((prev, curr) => {
+            const value = Number(curr)
+            if (!isNaN(value)) {
+              return prev + curr
+            } else {
+              return prev
+            }
+          }, 0).toFixed(2)
+
+          // 这里写自定义逻辑
+          // if (column.property === 'needQty' || column.property === 'confirmQty') {
+          //   sums[index] = sums[index]
+          // } else {
+          //   sums[index] = ''
+          // }
+          if (index === 23) {
+            sums[index] = parseInt(sums[index])
+          }
+          if (index === 14 || index > 23) {
+            sums[index] = sums[index]
+          } else if (index === 23) {
+            sums[index] = parseInt(sums[index], 10)
+          } else {
+            sums[index] = ''
+          }
+        } else {
+          sums[index] = ''
+        }
+      })
+
+      return sums
+    },
     // 表头内容过长处理
     renderHeader (h, g) {
       return renderHeaderUtil(h, g)
@@ -436,9 +480,9 @@ export default {
         })
     },
     // 多选
-    selectionChangeHandle (val) {
-      this.dataListSelections = val
-    },
+    // selectionChangeHandle (val) {
+    //   this.dataListSelections = val
+    // },
     // 重算
     recalculation () {
       // 有必填字段，先校验
@@ -520,7 +564,7 @@ export default {
               params: this.searchData
             }).then(({ data }) => {
               if (data && data.code === 0) {
-                 this.$notify({
+                this.$notify({
                   type: 'success',
                   message: '归档成功',
                   duration: 5000

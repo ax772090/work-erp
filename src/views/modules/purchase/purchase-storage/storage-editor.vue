@@ -252,20 +252,8 @@ export default {
     }
   },
   created () {
-    this.$http
-      .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-        params: { dataDictKey: 'APPROVAL_STATUS' }
-      })
-      .then(({ data }) => {
-        this.dictDocStatusOptions = data.fontMaps
-      })
-    this.$http
-      .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-        params: { dataDictKey: 'WAREHOUSE_INVENTORY_STATUS' }
-      })
-      .then(({ data }) => {
-        this.inventoryStatus = data.fontMaps
-      })
+    this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'APPROVAL_STATUS' } }).then(({ data }) => { this.dictDocStatusOptions = data.fontMaps })
+    this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'WAREHOUSE_INVENTORY_STATUS' } }).then(({ data }) => { this.inventoryStatus = data.fontMaps })
   },
   methods: {
     // 搜索建议框
@@ -286,12 +274,10 @@ export default {
         })
       }, 500 * Math.random())
     },
+
     // 获取采购入库的详情
     storageDetailData () {
-      this.$http
-        .get(
-          this.$http.adornUrl(`/warehouse/whinstockpo/info/${this.dataForm.id}`)
-        )
+      this.$http.get(this.$http.adornUrl(`/warehouse/whinstockpo/info/${this.dataForm.id}`))
         .then(({ data }) => {
           if (data && data.code === 0) {
             this.dataForm = data.poInstockDto
@@ -299,11 +285,11 @@ export default {
           }
         })
     },
+
     compNameChange (value, num) {
-      this.$http
-        .get(this.$http.adornUrl('list/combobox/warehouse-comp'), {
-          params: { compId: value }
-        })
+      this.$http.get(this.$http.adornUrl('list/combobox/warehouse-comp'), {
+        params: { compId: value }
+      })
         .then(({ data }) => {
           this.warehouseIdOption = data.list
         })
@@ -351,6 +337,7 @@ export default {
       this.type = 'search' // 类型为查看
       this.getDataList(id)
     },
+
     // 编辑
     initEdit (id) {
       this.getDataList(id)
@@ -360,12 +347,11 @@ export default {
       this.isDisabled = false
       this.isInventoryStatus = true
     },
+
     // 数据调用
     getDataList (id) {
       this.$http({
-        url: this.$http.adornUrl(
-          `warehouse/whinstockpo/info/${id}`
-        ),
+        url: this.$http.adornUrl(`warehouse/whinstockpo/info/${id}`),
         method: 'get'
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -374,6 +360,7 @@ export default {
         }
       })
     },
+
     // 表单提交
     dataFormSubmit (id, type) {
       this.$refs['dataForm'].validate(valid => {
@@ -407,10 +394,12 @@ export default {
         }
       })
     },
+
     // 入库时间
     formatTime (time) {
       this.dataForm.date = time // date是绑定的值
     },
+
     // 确认入库
     commit: _.debounce(
       async function commit () {
@@ -450,7 +439,7 @@ export default {
                 this.$notify.success({
                   dangerouslyUseHTMLString: true,
                   title: '成功',
-                  message: `采购入库单[单号：${data.entity.code}保存并确认成功]，可在采购入库列表进行查看。</br><span>成功生成采购应付单:${data.entity.yfCodes.join('</br>')}</span>`,
+                  message: `采购入库单[单号：${data.entity.code}保存并确认成功]，可在采购入库列表进行查看。</br><span>${data.entity.yfCodes.length > 0 ? '成功生成采购应付单:' + data.entity.yfCodes.join('</br>') : ''}</span>`,
                   // message: `确认成功,编码为:${data.entity.code}`,
                   duration: 5000
                 })
@@ -468,9 +457,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -499,6 +486,7 @@ export default {
                 }
               }
             }
+            
             // 新增页面
             this.$http({
               url: this.$http.adornUrl(`warehouse/whinstockpo/${this.type == 'add' ? 'save' : 'update'}`),
@@ -527,9 +515,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }

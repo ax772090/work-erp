@@ -91,15 +91,30 @@
             <el-table-column prop="shipPlanDate"
                              label="预计派送日期"></el-table-column>
             <el-table-column prop="outboxQty"
-                             label="单箱数量"></el-table-column>
+                             label="单箱数量"
+                             min-width="60"></el-table-column>
             <el-table-column prop="outboxWeight"
-                             label="单箱重量"></el-table-column>
+                             label="单箱重量"
+                             min-width="60"></el-table-column>
             <el-table-column prop="countOutboxQty"
-                             label="总箱数"></el-table-column>
+                             label="总箱数"
+                             min-width="60"></el-table-column>
             <el-table-column prop="outboxSize"
                              label="单箱体积"></el-table-column>
             <el-table-column prop="countOutboxWeight"
                              label="总重量"></el-table-column>
+            <el-table-column fixed="right"
+                             label="操作"
+                             width="120">
+              <template slot-scope="scope">
+                <el-button type="danger"
+                           size="mini"
+                           v-if="isAuth('warehouse:whdeliveryplan:getSkuLabel')"
+                           @click="printProdLabel(scope.row)">
+                  打印产品标签
+                </el-button>
+              </template>
+            </el-table-column>
 
           </el-table>
         </template>
@@ -150,6 +165,8 @@
                   size="small">是</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="fbaShipmentId"
+                       label="FBAshipmentID"></el-table-column>
       <el-table-column prop="updUser"
                        label="修改人"></el-table-column>
       <el-table-column prop="updTime"
@@ -202,6 +219,12 @@
               <el-dropdown-item command="uploadHandle"
                                 @click.native="uploadHandle(scope.row.id)"
                                 v-if="isAuth('warehouse:whdeliveryplan:print')">下载拣货单</el-dropdown-item>
+              <el-dropdown-item command="printBox"
+                                @click.native="printBox(scope.row)"
+                                v-if="isAuth('warehouse:whdeliveryplan:getPackageLabel')">打印箱唛</el-dropdown-item>
+              <el-dropdown-item command="register"
+                                @click.native="register(scope.row.id)"
+                                v-if="isAuth('warehouse:whdeliveryplan:registerShipmentId')">登记FBAshipmentID</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -226,6 +249,13 @@
     <!-- 审核弹窗(新) -->
     <approval-dialog ref="approvalDialog"
                      @approval="getDataList()"></approval-dialog>
+    <!-- 登记 -->
+    <register ref="register"
+              @refreshDataList="getDataList"></register>
+    <!-- 打印产品标签 -->
+    <print-prodlabel ref="prodlabel"></print-prodlabel>
+    <!--打印箱唛 -->
+    <print-box ref="printBox"></print-box>
   </div>
 </template>
 
@@ -255,6 +285,10 @@ import { initData } from '@/mixins/initData.js'
 import { getUrl, getRequest } from '@/utils'
 // 引入radio组件
 import elRadioGroup from '@/components/erp-radio/radio-all'
+import register from './register-fbashipId'
+// 打印产品标签
+import printProdlabel from './print-prod-label'
+import printBox from './print-box'
 export default {
   mixins: [initData],
   components: {
@@ -267,7 +301,10 @@ export default {
     erpTable,
     approvalDetaile,
     transOutDetaile,
-    elRadioGroup
+    elRadioGroup,
+    register,
+    printProdlabel,
+    printBox
   },
   data () {
     return {
@@ -587,11 +624,7 @@ export default {
             ...data.deliveryPlanInfo.whDeliveryPlanDetailList
           ]
           whDeliveryPlanDetailList.forEach(item => {
-            this.$set(
-              item,
-              'expectArriveDate',
-              whDeliveryPlanEntity.expectArriveDate
-            )
+            this.$set(item, 'expectArriveDate', whDeliveryPlanEntity.expectArriveDate)
           })
           this.$set(row, 'tableDataExpand', whDeliveryPlanDetailList)
         } else {
@@ -744,9 +777,7 @@ export default {
             }
           })
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -773,9 +804,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -810,9 +839,7 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
@@ -891,7 +918,60 @@ export default {
           })
         }
       })
+    },
+    // 打印箱唛
+    printBox (row) {
+      if (!row.fbaShipmentId) {
+        this.$notify.warning({
+          title: '提示',
+          message: 'FBAshipment为空，获取不到箱唛信息，无法打印，请先登记FBAshipmentID!',
+          duration: 3000
+        })
+      } else {
+        this.$nextTick(() => {
+          this.$refs.printBox.init(row)
+        })
+        // window.open(
+        //   this.$http.tokens(`warehouse/whdeliveryplan/getPackageLabel`,
+        //     { 'id': row.id,
+        //       'fbaShipmentId': row.fbaShipmentId,
+        //       'boxQty': 4
+        //     })
+        // )
+      }
+    },
+    register (id) {
+      this.$nextTick(() => {
+        this.$refs.register.init(id)
+      })
+    },
+    // 打印产品标签
+    printProdLabel (row) {
+      if (!row.fbaShipmentId) {
+        this.$notify.warning({
+          title: '提示',
+          message: 'FBAshipment为空，获取不到箱唛信息，无法打印，请先登记FBAshipmentID!',
+          duration: 3000
+        })
+      } else {
+        this.$nextTick(() => {
+          this.$refs.prodlabel.init(row)
+        })
+      }
     }
+    // printProdLabel (row) {
+    //   if (!row.fbaShipmentId) {
+    //     this.$notify.warning({
+    //       title: '提示',
+    //       message: 'FBAshipment为空，获取不到箱唛信息，无法打印，请先登记FBAshipmentID!',
+    //       duration: 3000
+    //     })
+    //   } else {
+    //     window.open(
+    //       this.$http.tokens(`warehouse/whdeliveryplan/getSkuLabel`, { 'id': row.id, 'fbaShipmentId': row.fbaShipmentId })
+    //     )
+    //   }
+    // }
   },
   watch: {
     '$route' (to, from) {
@@ -905,3 +985,8 @@ export default {
   }
 }
 </script>
+<style>
+.el-table .el-table__expanded-cell {
+  padding: 20px 80px 20px 50px;
+}
+</style>

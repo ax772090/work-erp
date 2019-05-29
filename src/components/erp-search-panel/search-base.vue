@@ -355,13 +355,11 @@ export default {
           if (item.value !== this.selectedOption) {
             continue
           }
-
           // 级联查询处理办法
-          if (item.inputType === 'el-cascader') {
-            console.log('val1：', val[val.length - 1])
-            this.searchData[this.selectedOption] = val[val.length - 1]
-            // this.searchData[this.selectedOption] = val
-          }
+            if (item.inputType === 'el-cascader') {
+              console.log('val1：', val[val.length - 1])
+              this.searchData[this.selectedOption] = val[val.length - 1]
+            }
         }
       }
 
@@ -370,16 +368,20 @@ export default {
 
   methods: {
     cascaderHandle (arr, val, childrenName) {
-      if (!arr || !Array.isArray(arr)) return []
+      if (!arr || !Array.isArray(arr)) return false
       for (const item of arr) {
-        if (item.levelPath === val) {
-          this.cascaderValue = []
-          this.cascaderValue.push(item.levelPath)
-          break
+        let tempArr = item.levelPath.split('.') || []
+        if (tempArr[tempArr.length - 1] === val) {
+          this.cascaderValue = tempArr
+          // 这里进行了优化，只要进到这里，说明已经找到了，所以调出整个递归循环
+          return true
         } else if (Array.isArray(item[childrenName])) {
-          this.cascaderHandle(item[childrenName], val, childrenName)
+          if (this.cascaderHandle(item[childrenName], val, childrenName)) {
+            return true
+          }
         }
       }
+      return false
     },
     /**
   * 添加查询条件传给父组件
@@ -445,14 +447,14 @@ export default {
         this.$emit('input', val)
       },
       deep: true
-    },
-    dataCascader: {
-      handler (newVal, oldVal) {
-        // 父级的v-model 默认可以接收该事件,实现将值传递给父级
-        // this.$emit('input', val)
-      },
-      deep: true
     }
+    // dataCascader: {
+    //   handler (newVal, oldVal) {
+    //     // 父级的v-model 默认可以接收该事件,实现将值传递给父级
+    //     // this.$emit('input', val)
+    //   },
+    //   deep: true
+    // }
   }
 }
 </script>

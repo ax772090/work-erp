@@ -299,6 +299,7 @@ export default {
         searchValue = Object.assign({}, searchObj)
         this.searchData = {}
       }
+      this.dataListLoading = true
       this.$http({
         url: this.$http.adornUrl('prod/proddevbasic/list'),
         method: 'post',

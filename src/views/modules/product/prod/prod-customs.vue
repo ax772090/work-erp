@@ -13,7 +13,6 @@
              href="http://kw.hscode.net/"
              target="_Blank">海关编码查询</a>
         </el-form-item>
-
       </el-row>
       <el-row>
         <el-form-item label="报关单位"
@@ -57,7 +56,7 @@
       <el-row>
         <el-form-item label="申报要素"
                       prop="declareFactor">
-          <textarea-all v-model="dataForm.declareFactor" ></textarea-all> 
+          <textarea-all v-model="dataForm.declareFactor"></textarea-all>
         </el-form-item>
       </el-row>
     </el-form>
@@ -65,7 +64,7 @@
 </template>
 <script>
 import selectAll from '@/components/erp-select/select-all'
-//备注组件
+// 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
 import Bus from '@/components/js/bus.js'
 
@@ -77,6 +76,7 @@ export default {
   },
   data () {
     return {
+      isCheck: false,
       currencyIdOptions: [], // 币种
       customsUnitIdOptions: [], // 报关单位
       formDisabled: false,
@@ -102,24 +102,18 @@ export default {
   // mounted: {},
   created () {
     // 币种主键
-    this.$http
-      .get(this.$http.adornUrl('dict/dictcurrency/listcombobox'))
-      .then(({ data }) => {
-        this.currencyIdOptions = data.list
-      })
+    this.$http.get(this.$http.adornUrl('dict/dictcurrency/listcombobox')).then(({ data }) => { this.currencyIdOptions = data.list })
     // 报关单位
-    this.$http
-      .get(this.$http.adornUrl('/dict/dictunit/listcombobox'))
-      .then(({ data }) => {
-        this.customsUnitIdOptions = data.list
-      })
+    this.$http.get(this.$http.adornUrl('/dict/dictunit/listcombobox')).then(({ data }) => { this.customsUnitIdOptions = data.list })
   },
   methods: {
     init (id, type, handleType, dataForm) {
+      this.isCheck = false
       // 1
       this.dataForm.pordId = id
       this.type = type
       if (handleType === '1') {
+        this.isCheck = true
         this.formDisabled = true
       } else if (handleType === 'copy') {
         this.dataForm.id = dataForm.prodBasicEntity.customsId
@@ -137,9 +131,7 @@ export default {
       this.$nextTick(() => {
         if (this.dataForm.pordId) {
           this.$http({
-            url: this.$http.adornUrl(
-              `prod/prodbasic/info/${this.dataForm.pordId}/${this.type}`
-            ),
+            url: this.$http.adornUrl(`prod/prodbasic/info/${this.dataForm.pordId}/${this.type}`),
             method: 'get',
             params: this.$http.adornParams({}, false)
           }).then(({ data }) => {
@@ -150,11 +142,9 @@ export default {
               this.dataForm.customsUnitId = data.prodBasicEntity.customsUnitId
               this.dataForm.cnName = data.prodBasicEntity.customsCnName
               this.dataForm.enName = data.prodBasicEntity.customsEnName
-              this.dataForm.declareMoney =
-                data.prodBasicEntity.customsDeclareMoney
+              this.dataForm.declareMoney = data.prodBasicEntity.customsDeclareMoney
               this.dataForm.currencyId = data.prodBasicEntity.customsCurrencyId
-              this.dataForm.declareFactor =
-                data.prodBasicEntity.customsDeclareFactor
+              this.dataForm.declareFactor = data.prodBasicEntity.customsDeclareFactor
             }
           })
         }
@@ -191,24 +181,19 @@ export default {
             })
           }
         })
-      },
-      1000,
-      {
+      }, 1000, {
         leading: true,
         trailing: false
       }
     ),
 
     // // 校验
-    // validate (activeName) {
-    //   this.$refs['dataForm'].validate(valid => {
-    //     if (valid) {
-    //       this.$emit('nextStep', activeName)
-    //     }
-    //   })
-    // },
     validate () {
       return new Promise((resolve, reject) => {
+        if (this.isCheck) {
+          resolve(true)
+          return
+        }
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
             resolve(valid)

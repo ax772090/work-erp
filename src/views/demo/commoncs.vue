@@ -28,7 +28,16 @@ export default {
     }
   },
   mounted () {
-    window.WwLogin({ "id": "wx_qrcode", "appid": "wwdbabbc550839b04a", "agentid": "", "redirect_uri": "www.baidu.com", "state": "", "href": "", });
+    window.WwLogin({
+      'id': 'wx_qrcode',
+      'appid': 'wwdbabbc550839b04a',
+      'scope': '',
+      'redirect_uri': 'www.baidu.com',
+      'state': '',
+      'href': 'www.baidu.com',
+      'state': '',
+      'style': ''
+    })
   }
 }
 </script>

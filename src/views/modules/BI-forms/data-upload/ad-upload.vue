@@ -29,6 +29,7 @@
                    accept='.xls,.xlsx,.xlsm'
                    :on-change="handleFileChange"
                    :on-remove="handleRemove"
+                   :on-exceed="handleExceed"
                    :file-list="fileList"
                    :auto-upload="false">
           <span slot="tip"
@@ -110,6 +111,13 @@ export default {
         this.$refs.upload.submit()
       }
     },
+    handleExceed (files, fileList) {
+      this.$notify.warning({
+        title: '提示',
+        message: `只支持上传一个文件`,
+        duration: 3000
+      })
+    },
     // 自定义上传
     uploadFile (options) {
       console.log('options:', options)
@@ -117,12 +125,12 @@ export default {
         if (valid) {
           let data = new FormData()
           data.append(options.filename, options.file)
-          let obj = Object.assign({}, data, this.dataForm)
-          console.log('obj', obj)
+          data.append('channel_id', this.dataForm.channel_id)
+          data.append('rpt_type', this.dataForm.rpt_type)
           this.$http({
             url: this.$http.adornUrl(`datacenter/api/upload/ams-ad`, false),
             method: 'post',
-            data: obj
+            data: data
           }).then(({ data }) => {
             if (data && data.code === 200) {
               this.$notify.success({
@@ -134,7 +142,7 @@ export default {
             } else {
               this.$notify.error({
                 title: '失败',
-                message: '导入失败',
+                message: data.msg,
                 duration: 3000
               })
             }

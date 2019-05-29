@@ -306,9 +306,7 @@ export default {
             }
           })
         })
-      },
-      1000,
-      { leading: true, trailing: false }
+      }, 1000, { leading: true, trailing: false }
     ),
 
     // 删除

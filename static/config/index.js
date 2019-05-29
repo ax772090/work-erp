@@ -23,10 +23,10 @@
   // window.SITE_CONFIG['baseUrl'] = 'http://192.168.8.110:8008/erp-web/'
 
   // 肖德辉
-  // window.SITE_CONFIG['baseUrl'] = 'http://192.168.8.109:8008/erp-web/'
+  window.SITE_CONFIG['baseUrl'] = 'http://192.168.8.109:8008/erp-web/'
 
   // 服务器
-   window.SITE_CONFIG['baseUrl'] = 'http://192.168.3.114:8008/erp-web/'
+  //  window.SITE_CONFIG['baseUrl'] = 'http://192.168.3.114:8008/erp-web/'
   // window.SITE_CONFIG['baseUrl'] = 'http://erp.substanbo.com:8008/erp-web/'
 
   // cdn地址 = 域名 + 版本号

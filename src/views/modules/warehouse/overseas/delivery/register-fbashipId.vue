@@ -6,7 +6,8 @@
              :before-close="handleClose">
     <el-form :model="dataForm"
              ref="dataForm"
-             label-width="110px">
+             :rules="dataRule"
+             label-width="120px">
       <el-form-item label="FBAShipmentID"
                     prop="fbaShipmentId">
         <el-input v-model.trim="dataForm.fbaShipmentId"
@@ -30,8 +31,11 @@ export default {
       dataForm: {
         id: '',
         fbaShipmentId: ''
+      },
+      dataRule: {
+        fbaShipmentId: [
+          { required: true, message: '必填项', trigger: 'change' }]
       }
-
     }
   },
   methods: {
@@ -55,26 +59,33 @@ export default {
       this.clearCache(formName)
     },
     saveOrSubmit () {
-      this.$http({
-        url: this.$http.adornUrl('warehouse/whdeliveryplan/registerShipmentId'),
-        method: 'get',
-        params: this.dataForm
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.$emit('refreshDataList')
-          this.$notify.success({
-            message: '登记成功',
-            duration: 1500,
-            title: '成功'
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.$http({
+            url: this.$http.adornUrl('warehouse/whdeliveryplan/registerShipmentId'),
+            method: 'get',
+            params: this.dataForm
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$emit('refreshDataList')
+              this.$notify.success({
+                message: '登记成功',
+                duration: 1500,
+                title: '成功'
+              })
+            } else {
+              this.$notify.error({
+                title: '错误',
+                message: data.msg,
+                duration: 5000
+              })
+            }
+            this.clearCache('dataForm')
+            this.visible = false
           })
         } else {
-          this.$notify.error({
-            title: '错误',
-            message: data.msg,
-            duration: 5000
-          })
+          return false
         }
-        this.visible = false
       })
     }
   }

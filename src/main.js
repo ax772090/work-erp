@@ -10,7 +10,7 @@ import '@/icons' // api: http://www.iconfont.cn/
 import '@/element-ui-theme'// 设置主题
 import '@/assets/scss/index.scss'
 import httpRequest from '@/utils/httpRequest'
-import { isAuth } from '@/utils'
+import { isAuth, notifySuccess, notifyError } from '@/utils'
 import * as filters from '@/filters'
 import QuestionIcon from '@/components/icon-svg/question-icon'
 import '@/assets/iconfont/iconfont.css'
@@ -34,6 +34,8 @@ if (process.env.NODE_ENV !== 'production') {
 // 挂载全局
 Vue.prototype.$http = httpRequest // ajax请求方法
 Vue.prototype.isAuth = isAuth // 权限方法
+Vue.prototype.notifySuccess = notifySuccess // 成功提示方法
+Vue.prototype.notifyError = notifyError // 失败提示方法
 
 Object.keys(`filters`).forEach((key) => {
   Vue.filter(key, filters[key])

@@ -135,6 +135,7 @@ import erpSearchPanel from '@/components/erp-search-panel'
 import paginationAll from '@/components/erp-pagination/pagination-all'
 import AddOrUpdate from './basicsupplier-add-or-update'
 import { initData } from '@/mixins/initData.js'
+import { basicSupplierList, basicSupplierActiveOrDis } from '@/api/basic/basic.js'
 export default {
   mixins: [initData],
   components: {
@@ -227,31 +228,15 @@ export default {
         for (let i = 0; i < this.dataListSelections.length; i++) {
           ListSelects.push(this.dataListSelections[i].id)
         }
-        this.$http({
-          url: this.$http.adornUrl('basic/basicsupplier/activeOrDis/'),
-          method: 'post',
-          data: this.$http.adornData(
-            {
-              activeOrNot: status,
-              ids: ListSelects
-            },
-            false
-          )
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.$emit('refreshDataList')
-            this.$notify.success({
-              title: '成功',
-              message: '操作成功',
-              duration: 1500
-            })
-          } else {
-            this.$notify.error({
-              title: '错误',
-              message: data.msg,
-              duration: 5000
-            })
-          }
+        basicSupplierActiveOrDis({
+          activeOrNot: status,
+          ids: ListSelects
+        }).then(data => {
+          this.$emit('refreshDataList')
+          this.getDataList()
+          this.notifySuccess('操作成功')
+        }).catch(e => {
+          this.notifyError(e.data.msg)
           this.getDataList()
         })
       }, 1000, {
@@ -266,26 +251,19 @@ export default {
         this.paginationData.currPage = val
       }
       this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('basic/basicsupplier/list'),
-        method: 'get',
-        params:
-          this.searchData == undefined
-            ? this.paginationData
-            : Object.assign({}, this.paginationData, this.searchData)
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.dataList = data.pageList.dataList
-          this.paginationData.totalCount = data.pageList.page.totalCount
-          this.paginationData.totalPage = data.pageList.page.totalPage
-          if (this.paginationData.totalPage < this.paginationData.currPage) {
-            this.paginationData.currPage = this.paginationData.totalPage
-            this.getDataList()
-          }
-        } else {
-          this.dataList = []
-          this.paginationData.totalCount = 0
+      let requestData = Object.assign({}, this.paginationData, this.searchData === undefined ? {} : this.searchData)
+      basicSupplierList(requestData).then((data) => {
+        this.dataList = data.pageList.dataList
+        this.paginationData.totalCount = data.pageList.page.totalCount
+        this.paginationData.totalPage = data.pageList.page.totalPage
+        if (this.paginationData.totalPage < this.paginationData.currPage) {
+          this.paginationData.currPage = this.paginationData.totalPage
+          this.getDataList()
         }
+        this.dataListLoading = false
+      }).catch(() => {
+        this.dataList = []
+        this.paginationData.totalCount = 0
         this.dataListLoading = false
       })
     },

@@ -78,6 +78,7 @@ import erpSearchPanel from '@/components/erp-search-panel'
 import paginationAll from '@/components/erp-pagination/pagination-all'
 import basiccustomerAddUpdate from './basiccustomer-add-update'
 import { initData } from '@/mixins/initData.js'
+import { basicCustomerList } from '@/api/basic/basic.js'
 export default {
   mixins: [
     initData
@@ -146,20 +147,14 @@ export default {
         this.paginationData.currPage = val
       }
       this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('basic/customer/list'),
-        method: 'get',
-        params:
-          this.searchData == undefined
-            ? this.paginationData
-            : Object.assign({}, this.paginationData, this.searchData)
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.dataList = data.pageList.dataList
-          this.paginationData.totalCount = data.pageList.page.totalCount
-        } else {
-          this.paginationData.totalCount = 0
-        }
+      let requestData = Object.assign({}, this.paginationData, this.searchData === undefined ? {} : this.searchData)
+      basicCustomerList(requestData).then(data => {
+        this.dataList = data.pageList.dataList
+        this.paginationData.totalCount = data.pageList.page.totalCount
+        this.dataListLoading = false
+      }).catch(e => {
+        this.dataList = []
+        this.paginationData.totalCount = 0
         this.dataListLoading = false
       })
     },

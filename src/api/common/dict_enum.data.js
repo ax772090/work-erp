@@ -15,6 +15,8 @@ export const INSTOCK_TYPE = 'INSTOCK_TYPE'
 export const INVOICE_TYPE = 'INVOICE_TYPE'
 export const OUTSTOCK_TYPE = 'OUTSTOCK_TYPE'
 export const PAY_MODE = 'PAY_MODE'
+
+// 隶属平台
 export const PLANTFORM_TYPE = 'PLANTFORM_TYPE'
 export const PLAN_BUSINESS_STATUS = 'PLAN_BUSINESS_STATUS'
 export const PO_INFO_BIZ_STATUS = 'PO_INFO_BIZ_STATUS'

@@ -152,6 +152,7 @@
 <script>
 import selectAll from '@/components/erp-select/select-all'
 import Bus from '@/components/js/bus.js'
+import { dictDictunitListcombobox, dictDictcurrencyListcombobox } from '@/api/common/common.api'
 export default {
   components: {
     selectAll
@@ -196,7 +197,7 @@ export default {
       outboxUnitIdOptions: '',
       // 空运币种
       airCurrencyIdOptions: '',
-      // 海运币种
+      // 海运币种海运币种
       seaCurrencyIdOptions: '',
       // 辅助属性类别
       supportTypeDictOptions: '',
@@ -230,23 +231,12 @@ export default {
   },
   created () {
     // 外箱整箱单位
-    this.$http
-      .get(this.$http.adornUrl('dict/dictunit/listcombobox'))
-      .then(({ data }) => {
-        this.outboxUnitIdOptions = data.list
-      })
+    dictDictunitListcombobox().then(data => { this.outboxUnitIdOptions = data.list })
     // 空运币种
-    this.$http
-      .get(this.$http.adornUrl('dict/dictcurrency/listcombobox'))
-      .then(({ data }) => {
-        this.airCurrencyIdOptions = data.list
-        this.seaCurrencyIdOptions = data.list
-      })
-    // 海运币种
-    this.$http
-      .get(this.$http.adornUrl('dict/dictcurrency/listcombobox'))
-      .then(({ data }) => {
-      })
+    dictDictcurrencyListcombobox().then(data => {
+      this.airCurrencyIdOptions = data.list
+      this.seaCurrencyIdOptions = data.list
+    })
   },
 
   methods: {

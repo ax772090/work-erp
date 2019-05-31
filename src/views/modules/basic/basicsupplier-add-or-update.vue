@@ -227,6 +227,8 @@
 <script>
 import selectAll from '@/components/erp-select/select-all'
 import { isEmail, isMobile } from '@/utils/validate'
+import { dictPayMode, dictPurchaseMode, dictPurchaseType, dictBankAccountType, dictSupplierStatus, basicBasicsupplierQueryCurrency, sysorganizationselect } from '@/api/common/common.api'
+import { basicSupplierInfo, basicSupplierSave, basicSupplierUpdate } from '@/api/basic/basic.js'
 // 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
 export default {
@@ -345,21 +347,22 @@ export default {
     }
   },
   created () {
-    this.queryDataDict2List('PAY_MODE')
+    // 付款方式
+    dictPayMode().then(data => { this.dictPayModeOptions = data.fontMaps })
     // 采购方式
-    this.queryDataDict2List('PURCHASE_MODE')
+    dictPurchaseMode().then(data => { this.dictPurchaseModeOptions = data.fontMaps })
     // 采购类型
-    this.queryDataDict2List('PURCHASE_TYPE')
+    dictPurchaseType().then(data => { this.dictPurchaseTypeOptions = data.fontMaps })
     // 账号类型
-    this.queryDataDict2List('BANK_ACCOUNT_TYPE')
+    dictBankAccountType().then(data => { this.dictBankAccountTypeOptions = data.fontMaps })
     // 开票方式
-    this.queryDataDict2List('INVOICE_TYPE')
-    // 数据字典
-    this.queryDataDict2List('SUPPLIER_STATUS')
+    dictBankAccountType().then(data => { this.dictInvoiceTypeOptions = data.fontMaps })
+    // 合作状态
+    dictSupplierStatus().then(data => { this.dictSupplierStatusOptions = data.fontMaps })
     // 结算币别
-    this.currencyIdSelect()
+    basicBasicsupplierQueryCurrency().then(data => { this.currencyIdOptions = data.currency })
     // 结算公司
-    this.comp()
+    sysorganizationselect().then(data => { this.compIdOption = data.companyList })
   },
   methods: {
     // 关闭清除本次缓存
@@ -401,69 +404,41 @@ export default {
         this.dataForm.supplierBank.usedInvoice = true
         this.dataForm.id = id
         if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(
-              `basic/basicsupplier/info/${this.dataForm.id}`
-            ),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm = data.basicSupplier
-            }
+          basicSupplierInfo(this.dataForm.id, true).then(data => {
+            this.dataForm = data.basicSupplier
+          }).catch(e => {
+            this.notifyError(e.data.msg)
           })
         }
       })
     },
-    // 查数据字典
-    queryDataDict2List (dictionaries) {
-      this.$http({
-        url: this.$http.adornUrl('basicData/queryDataDict2List'),
-        method: 'get',
-        params: this.$http.adornParams({
-          dataDictKey: dictionaries
+
+    // 新增/编辑
+    basicsupplierHttp () {
+      // 新增
+      if (!this.dataForm.id) {
+        basicSupplierSave(this.dataForm).then((data) => {
+          this.clearCache('dataForm')
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
         })
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          // 付款方式
-          if (dictionaries == 'PAY_MODE') {
-            this.dictPayModeOptions = data.fontMaps
-            // 采购方式
-          } else if (dictionaries == 'PURCHASE_MODE') {
-            this.dictPurchaseModeOptions = data.fontMaps
-            // 采购类型
-          } else if (dictionaries == 'PURCHASE_TYPE') {
-            this.dictPurchaseTypeOptions = data.fontMaps
-            // 账号类型
-          } else if (dictionaries == 'BANK_ACCOUNT_TYPE') {
-            this.dictBankAccountTypeOptions = data.fontMaps
-            // 开票方式
-          } else if (dictionaries == 'INVOICE_TYPE') {
-            this.dictInvoiceTypeOptions = data.fontMaps
-          } else if (dictionaries == 'SUPPLIER_STATUS') {
-            this.dictSupplierStatusOptions = data.fontMaps
-          }
-        }
-      })
-    },
-    // 结算公司
-    comp () {
-      this.$http
-        .get(this.$http.adornUrl('sys/organization/select'))
-        .then(({ data }) => {
-          this.compIdOption = data.companyList
+      }
+      // 编辑
+      if (this.dataForm.id) {
+        basicSupplierUpdate(this.dataForm).then((data) => {
+          this.clearCache('dataForm')
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
         })
+      }
     },
-    // 结算币别
-    currencyIdSelect () {
-      this.$http({
-        url: this.$http.adornUrl('basic/basicsupplier/queryCurrency'),
-        method: 'get',
-        params: this.$http.adornParams()
-      }).then(({ data }) => {
-        this.currencyIdOptions = data.currency
-      })
-    },
+
     // 表单提交
     dataFormSubmit: _.debounce(
       async function dataFormSubmit () {
@@ -498,33 +473,9 @@ export default {
                   message: '邮箱格式错误',
                   duration: 5000
                 })
-                return
               }
             }
-            this.$http({
-              url: this.$http.adornUrl(
-                `basic/basicsupplier/${!this.dataForm.id ? 'save' : 'update'}`
-              ),
-              method: !this.dataForm.id ? 'post' : 'put',
-              data: this.dataForm
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.clearCache('dataForm')
-                this.$emit('refreshDataList')
-                this.visible = false
-                this.$notify.success({
-                  title: '成功',
-                  message: '操作成功',
-                  duration: 1000
-                })
-              } else {
-                this.$notify.error({
-                  title: '错误',
-                  message: data.msg,
-                  duration: 5000
-                })
-              }
-            })
+            this.basicsupplierHttp()
           }
         })
       }, 1000, {

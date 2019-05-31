@@ -31,6 +31,7 @@
   </el-dialog>
 </template>
 <script>
+import { listSearchUser } from '@/api/common/common.api'
 export default {
   data () {
     return {
@@ -67,19 +68,10 @@ export default {
     userQuerySearch (queryString) {
       clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
-        this.$http({
-          url: this.$http.adornUrl('list/search/user'),
-          method: 'get',
-          params: this.$http.adornParams(
-            {
-              name: queryString
-            },
-            false
-          )
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.userOptions = data.list
-          }
+        listSearchUser({
+          name: queryString
+        }).then(data => {
+          this.userOptions = data.list
         })
       }, 500 * Math.random())
     },

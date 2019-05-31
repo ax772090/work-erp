@@ -47,6 +47,15 @@
                             :isSelectChange="true"
                             @selectChange="channelChange"></select-all>
               </el-form-item>
+              <el-form-item label="箱数"
+                            prop=totalBoxQty
+                            :rules="dataForm.dictDocStatus === '02'?dataRule.totalBoxQtyIsNo:dataRule.totalBoxQty">
+                <el-input v-model="dataForm.totalBoxQty"
+                          placeholder="箱数"
+                          type="Number"
+                          :disabled="disableQty"
+                          @mousewheel.native.prevent></el-input>
+              </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="要求发货日期"
@@ -581,6 +590,7 @@ export default {
       }
     }
     return {
+      disableQty: false,
       activeNames: ['1', '2'],
       disableApprove: false, // 审核时为true
       type: '',
@@ -611,6 +621,7 @@ export default {
         planDate: dateFormatter(new Date(), false), // 将"2018-11-08T09:07:37.648Z"转换为"2018-11-08"
         sellerId: '',
         remark: '',
+        totalBoxQty: '',
         dictNeedPlatform: '01', // 默认亚马逊
         dictNeedPlantform: '',
         dictDocStatus: '01', // 单据状态默认'01'
@@ -662,6 +673,9 @@ export default {
         daySale: [{ validator: valiIntegerByZero, trigger: 'blur' }],
         estimateQty: [{ validator: valiIntegerByZero, trigger: 'blur' }],
         needQty: [{ validator: validateInteger, trigger: 'blur' }],
+        totalBoxQty: [
+          { required: true, message: '必填项', trigger: 'change' },
+          { pattern: /^[1-9]\d*$/, message: '正整数', trigger: 'change' }],
         confirmQty: [
           { required: true, message: '必填项', trigger: 'change' },
           { pattern: /^[1-9]\d*$/, message: '正整数', trigger: 'change' }],
@@ -669,6 +683,8 @@ export default {
           { required: true, message: '必填项', trigger: 'change' },
           { pattern: /^[1-9]\d*$/, message: '正整数', trigger: 'change' }
         ],
+        totalBoxQtyIsNo: [{ required: false, message: '', trigger: 'change' },
+        { pattern: /^[1-9]\d*$/, message: '正整数', trigger: 'change' }],
         qualifiedQty: [
           { required: false, message: '', trigger: 'change' },
           { pattern: /^[+]{0,1}(\d+)$/, message: '正整数', trigger: 'change' }]
@@ -1058,6 +1074,7 @@ export default {
       this.dataCall(id)
     },
     initCheck (id) {
+      this.disableQty = true
       this.isDisabled = true
       this.isDisableT02 = true
       this.isDisableT03 = true

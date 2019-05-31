@@ -37,6 +37,8 @@
 <script>
 import selectSeach from '@/components/erp-select/select-seach'
 import selectAll from '@/components/erp-select/select-all'
+import { prodskuparamsInfo, prodskuparamsSave, prodskuparamsUpdate } from '@/api/basic/basic'
+import { prodProdskuparamsListrulesparams } from '@/api/common/common.api'
 export default {
   components: {
     selectSeach,
@@ -65,9 +67,7 @@ export default {
     }
   },
   created () {
-    this.$http.get(this.$http.adornUrl('prod/prodskuparams/listrulesparams')).then(({ data }) => {
-      this.keyOptions = data.list
-    })
+    prodProdskuparamsListrulesparams().then(data => { this.keyOptions = data.list })
   },
   methods: {
     // 关闭清除本次缓存
@@ -92,54 +92,45 @@ export default {
       this.dataForm.addUser = null
       this.$nextTick(() => {
         if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(
-              `prod/prodskuparams/info/${this.dataForm.id}`
-            ),
-            method: 'get'
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm = Object.assign({}, data.prodSkuParams, { updTime: null, updUser: null })
-            } else {
-              this.$notify.error({
-                title: '失败',
-                message: data.msg,
-                duration: 5000
-              })
-            }
+          prodskuparamsInfo(this.dataForm.id, true).then((data) => {
+            this.dataForm = Object.assign({}, data.prodSkuParams, { updTime: null, updUser: null })
+          }).catch((error) => {
+            this.notifyError(error.data.msg)
           })
         }
       })
+    },
+    // 新增/编辑
+    basicsupportHttp () {
+      // 新增
+      if (!this.dataForm.id) {
+        prodskuparamsSave(this.dataForm).then((data) => {
+          this.$refs['dataForm'].resetFields()
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
+      // 编辑
+      if (this.dataForm.id) {
+        prodskuparamsUpdate(this.dataForm).then((data) => {
+          this.$refs['dataForm'].resetFields()
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
     },
     // 表单提交
     dataFormSubmit: _.debounce(
       async function dataFormSubmit () {
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(
-                `prod/prodskuparams/${!this.dataForm.id ? 'save' : 'update'}`
-              ),
-              method: !this.dataForm.id ? 'post' : 'put',
-              data: this.$http.adornData(this.dataForm, false)
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.$refs['dataForm'].resetFields()
-                this.$emit('refreshDataList')
-                this.visible = false
-                this.$notify.success({
-                  title: '成功',
-                  message: '操作成功',
-                  duration: 1500
-                })
-              } else {
-                this.$notify.error({
-                  title: '失败',
-                  message: data.msg,
-                  duration: 5000
-                })
-              }
-            })
+            this.basicsupportHttp()
           }
         })
       }, 1000, {

@@ -58,6 +58,9 @@
 import selectAll from '@/components/erp-select/select-all'
 // 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
+import { dictCurrencyRound } from '@/api/common/common.api'
+import { dictUnitInfo, dictUnitSave, dictUnitUpdate } from '@/api/basic/basic.js'
+
 export default {
   components: {
     selectAll,
@@ -101,26 +104,9 @@ export default {
   },
   created () {
     // 四舍五入
-    this.queryDataDict2List('CURRENCY_ROUND')
+    dictCurrencyRound().then(data => { this.dictCurrencyRoundOptions = data.fontMaps })
   },
   methods: {
-    // 查数据字典
-    queryDataDict2List (dictionaries) {
-      this.$http({
-        url: this.$http.adornUrl('basicData/queryDataDict2List'),
-        method: 'get',
-        params: this.$http.adornParams({
-          dataDictKey: dictionaries
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          // 四舍五入
-          if (dictionaries === 'CURRENCY_ROUND') {
-            this.dictCurrencyRoundOptions = data.fontMaps
-          }
-        }
-      })
-    },
     init (id, type) {
       this.dataForm.addTime = ''
       this.dataForm.addUser = ''
@@ -131,46 +117,45 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(`dict/dictunit/info/${this.dataForm.id}`),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm = data.dictUnit
-            }
+          dictUnitInfo(this.dataForm.id, true).then(data => {
+            this.dataForm = data.dictUnit
+          }).catch(e => {
+            this.notifyError(e.data.msg)
           })
         }
       })
+    },
+    // 新增/编辑
+    dictunitHttp () {
+      // 新增
+      if (!this.dataForm.id) {
+        dictUnitSave(this.dataForm).then((data) => {
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
+      // 编辑
+      if (this.dataForm.id) {
+        dictUnitUpdate(this.dataForm).then((data) => {
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
     },
     // 表单提交
     dataFormSubmit: _.debounce(
       async function dataFormSubmit () {
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(
-                `/dict/dictunit/${!this.dataForm.id ? 'save' : 'update'}`
-              ),
-              method: !this.dataForm.id ? 'post' : 'put',
-              data: this.dataForm
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.$emit('refreshDataList')
-                this.visible = false
-                this.$notify.success({
-                  title: '成功',
-                  message: '操作成功',
-                  duration: 5000
-                })
-              } else {
-                this.$notify.error({
-                  title: '错误',
-                  message: data.msg,
-                  duration: 5000
-                })
-              }
-            })
+            this.dictunitHttp()
+          } else {
+            return false
           }
         })
       }, 1000, {

@@ -167,6 +167,7 @@ import erpSearchPanel from '@/components/erp-search-panel'
 import paginationAll from '@/components/erp-pagination/pagination-all'
 import AddOrUpdate from './basicsupport-add-or-update'
 import { initData } from '@/mixins/initData.js'
+import { prodskurulesList, prodskurulesInfo, prodskurulesDelete, prodskurulesSave, prodskurulesUpdate, prodskuparamsList, prodskuparamsDelete } from '@/api/basic/basic'
 export default {
   mixins: [initData],
   components: {
@@ -248,14 +249,6 @@ export default {
     this.getDataList()
   },
   methods: {
-    // handleCheckChange (data, checked, indeterminate) {
-
-    //   if (this.$refs.tree.getCheckedKeys().length > 0) {
-    //     this.delSupTypeDis = false
-    //   } else {
-    //     this.delSupTypeDis = true
-    //   }
-    // },
     // 关闭清除本次缓存
     clearCache (formName) {
       this.$refs[formName].resetFields()
@@ -290,19 +283,10 @@ export default {
       this.addSupTypeVisible = true
 
       if (data) {
-        this.$http({
-          url: this.$http.adornUrl(`prod/prodskurules/info/${data.id}`),
-          method: 'get'
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.addSupTypeForm = Object.assign({}, this.addSupTypeForm, data.prodSkuRules)
-          } else {
-            this.$notify.error({
-              title: '错误',
-              message: data.msg,
-              duration: 5000
-            })
-          }
+        prodskurulesInfo(data.id, true).then((data) => {
+          this.addSupTypeForm = Object.assign({}, this.addSupTypeForm, data.prodSkuRules)
+        }).catch(e => {
+          this.notifyError(e.data.msg)
         })
       }
     },
@@ -322,79 +306,46 @@ export default {
         })
       })
     },
-    // 编辑辅助类型
-    // editTypeHandle (data) {
-    //   if (data.id) {
-    //     this.$http({
-    //       url: this.$http.adornUrl(`warehouse/whdeliveryplan/info/${data.id}`),
-    //       method: 'get'
-    //     }).then(({ data }) => {
-    //       if (data && data.code === 0) {
-    //         // this.addSupTypeForm = data.deliveryPlanInfo
-    //       } else {
-    //         this.$notify.error({
-    //           title: '错误',
-    //           message: data.msg,
-    //           duration: 5000
-    //         })
-    //       }
-    //     })
-    //   }
-    // },
     delSupType (data) {
       let ids = this.$refs.tree.getCurrentKey()
-      this.$http({
-        url: this.$http.adornUrl('prod/prodskurules/delete'),
-        method: 'delete',
-        data: this.$http.adornData([ids], false)
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.getTypeData()
-          this.$notify.success({
-            title: '成功',
-            message: '操作成功',
-            duration: 5000
-          })
-        } else {
-          this.$notify.error({
-            title: '删除失败',
-            message: data.msg,
-            duration: 5000
-          })
-        }
+      prodskurulesDelete([ids]).then(data => {
+        this.getTypeData()
+        this.notifySuccess('操作成功')
+      }).catch(e => {
+        this.notifyError(e.data.msg)
       })
+    },
+    // 新增/编辑-辅助类型
+    basicsupportHttp () {
+      // 新增
+      if (!this.addSupTypeForm.id) {
+        prodskurulesSave(this.addSupTypeForm).then((data) => {
+          this.getTypeData()
+          this.clearCache('addSupTypeForm')
+          this.addSupTypeVisible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
+      // 编辑
+      if (this.addSupTypeForm.id) {
+        prodskurulesUpdate(this.addSupTypeForm).then((data) => {
+          this.getTypeData()
+          this.clearCache('addSupTypeForm')
+          this.addSupTypeVisible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
     },
     // 新增、编辑辅助类型的保存
     saveSupType: _.debounce(
       async function saveSupType () {
         this.$refs['addSupTypeForm'].validate((valid) => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(
-                `prod/prodskurules/${
-                !this.addSupTypeForm.id ? 'save' : 'update'
-                }`
-              ),
-              method: !this.addSupTypeForm.id ? 'post' : 'put',
-              data: this.$http.adornData(this.addSupTypeForm, false)
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.getTypeData()
-                this.clearCache('addSupTypeForm')
-                this.addSupTypeVisible = false
-                this.$notify.success({
-                  message: '操作成功',
-                  duration: 2000,
-                  title: '成功'
-                })
-              } else {
-                this.$notify.error({
-                  title: '错误',
-                  message: data.msg,
-                  duration: 5000
-                })
-              }
-            })
+            this.basicsupportHttp()
           } else {
             return false
           }
@@ -403,19 +354,14 @@ export default {
     ),
     // 获取辅助类型数据
     getTypeData () {
-      this.$http({
-        url: this.$http.adornUrl('prod/prodskurules/list'),
-        method: 'get'
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          data.dataList.forEach(item => {
-            this.$set(item, 'label', item.name)
-            this.$set(item, 'type', '2')
-          })
-          this.treeData[0].children = data.dataList
-        } else {
-          this.treeData[0].children = []
-        }
+      prodskurulesList().then(data => {
+        data.dataList.forEach(item => {
+          this.$set(item, 'label', item.name)
+          this.$set(item, 'type', '2')
+        })
+        this.treeData[0].children = data.dataList
+      }).catch(e => {
+        this.treeData[0].children = []
       })
     },
     // 获取辅助资料数据列表
@@ -423,32 +369,15 @@ export default {
       if (val != undefined) {
         this.paginationData.currPage = val
       }
-      // let isObj = Object.prototype.toString.call(val) === '[object Object]'
-      // if (val != undefined && !isObj) {
-      //   this.paginationData.currPage = val
-      // } else if (isObj) {
-      //   this.paginationData.currPage = val.curPage
-      // }
-      // let obj = {}
-      // if (isObj && val.hasOwnProperty('key')) {
-      //   obj = val
-      // }
       this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('prod/prodskuparams/list'),
-        method: 'get',
-        params:
-          this.searchData == undefined
-            ? this.paginationData
-            : Object.assign({}, this.paginationData, this.searchData)
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.dataList = data.pageList.dataList
-          this.paginationData.totalCount = data.pageList.page.totalCount
-        } else {
-          this.dataList = []
-          this.paginationData.totalCount = 0
-        }
+      let requestData = Object.assign({}, this.paginationData, this.searchData === undefined ? {} : this.searchData)
+      prodskuparamsList(requestData).then(data => {
+        this.dataList = data.pageList.dataList
+        this.paginationData.totalCount = data.pageList.page.totalCount
+        this.dataListLoading = false
+      }).catch(e => {
+        this.dataList = []
+        this.paginationData.totalCount = 0
         this.dataListLoading = false
       })
     },
@@ -480,25 +409,11 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http({
-          url: this.$http.adornUrl('prod/prodskuparams/delete'),
-          method: 'delete',
-          data: this.$http.adornData(ids, false)
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.getDataList(1)
-            this.$notify.success({
-              title: '成功',
-              message: '操作成功',
-              duration: 5000
-            })
-          } else {
-            this.$notify.error({
-              title: '删除失败',
-              message: data.msg,
-              duration: 5000
-            })
-          }
+        prodskuparamsDelete(ids).then(data => {
+          this.getDataList(1)
+          this.notifySuccess('操作成功')
+        }).catch(e => {
+          this.notifyError(e.data.msg)
         })
       })
     }

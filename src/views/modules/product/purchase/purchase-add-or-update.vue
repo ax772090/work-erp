@@ -168,7 +168,7 @@ import selectSeach from '@/components/erp-select/select-seach'
 import selectAll from '@/components/erp-select/select-all'
 // 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
-
+import { listComboboxCompany, basicDataQueryAllCurrency } from '@/api/common/common.api'
 export default {
   components: {
     selectSeach,
@@ -290,19 +290,9 @@ export default {
     },
     getDataUrl () {
       // 币别
-      this.$http
-        .get(this.$http.adornUrl('basicData/queryAllCurrency'))
-        .then(({ data }) => {
-          this.currencyIdOptions = data.currencyList
-        })
+      basicDataQueryAllCurrency().then(data => { this.currencyIdOptions = data.currencyList })
       // 公司
-      this.$http
-        .get(this.$http.adornUrl('list/combobox/company'))
-        .then(({
-          data
-        }) => {
-          this.compIdOptions = data.list
-        })
+      listComboboxCompany().then(data => { this.compIdOptions = data.list })
     },
     init (id, type) {
       // Object.assign(this.$data, this.$options.data())

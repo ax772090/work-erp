@@ -591,12 +591,29 @@ export default {
       // 有必填字段，先校验
       this.$refs['dataForm'].validate(valid => {
         if (valid) {
-          this.$set(this.searchData, 'yearMonth', this.dataForm.yearMonth)
-          window.open(
-            this.$http.tokens(
-              'fin/finsettledata/exportSettleData', this.searchData
-            )
-          )
+          if (this.dataForm) {
+            Object.assign(this.searchData, this.dataForm)
+          }
+          this.$http({
+            url: this.$http.adornUrl('fin/finsettledata/checkInExport'),
+            method: 'get',
+            params: this.searchData
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              window.open(
+                this.$http.tokens(
+                  'fin/finsettledata/exportSettleData', this.searchData
+                )
+              )
+            } else {
+              this.$notify.warning({
+                title: '错误',
+                message: data.msg,
+                duration: 5000
+              })
+            }
+          })
+          // this.$set(this.searchData, 'yearMonth', this.dataForm.yearMonth)
         }
       })
     }

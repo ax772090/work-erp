@@ -86,6 +86,7 @@
 import selectSeach from '@/components/erp-select/select-seach'
 import selectAll from '@/components/erp-select/select-all'
 import Bus from '@/components/js/bus.js'
+import { basicDataQueryAllCurrency, basicBasicchannelListcombobox } from '@/api/common/common.api'
 export default {
   props: ['value'],
   components: {
@@ -131,17 +132,9 @@ export default {
   },
   created () {
     // 币别
-    this.$http
-      .get(this.$http.adornUrl('basicData/queryAllCurrency'))
-      .then(({ data }) => {
-        this.currencyIdOptions = data.currencyList
-      })
+    basicDataQueryAllCurrency().then(data => { this.currencyIdOptions = data.currencyList })
     // 销售站点
-    this.$http
-      .get(this.$http.adornUrl('basic/basicchannel/listcombobox'))
-      .then(({ data }) => {
-        this.channelIdOptions = data.list
-      })
+    basicBasicchannelListcombobox().then(data => { this.channelIdOptions = data.list })
   },
   methods: {
     init (id, type, handleType, dataForm) { // 4

@@ -82,29 +82,8 @@ export default {
       }
     }
   },
-  created () {
-    let dictionaries
-    // 四舍五入
-    this.queryDataDict2List((dictionaries = 'CURRENCY_ROUND'))
-  },
+
   methods: {
-    // 查数据字典
-    queryDataDict2List (dictionaries) {
-      this.$http({
-        url: this.$http.adornUrl('basicData/queryDataDict2List'),
-        method: 'get',
-        params: this.$http.adornParams({
-          dataDictKey: dictionaries
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          // 四舍五入
-          if (dictionaries === 'CURRENCY_ROUND') {
-            // this.dataForm.dictCurrencyRound.options = data.fontMaps
-          }
-        }
-      })
-    },
     init (id) {
       this.dataForm.bUsed = 1
       this.dataForm.id = id

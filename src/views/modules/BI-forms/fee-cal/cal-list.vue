@@ -218,7 +218,7 @@
           <p>{{dataList.first_volume_weight}}</p>
         </div>
         <div>
-          <p>海运每立方米费用</p>
+          <p>海运每KG费用</p>
           <p>{{dataList.see_first_fee}}</p>
         </div>
         <div>

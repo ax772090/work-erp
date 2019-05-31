@@ -3,7 +3,7 @@ import * as dictEnumData from './dict_enum.data.js'
 
 /**
  * 方法名命名规则:
- * 公共方法
+ * 数据字典公共方法
  */
 function dict (dataDictKeya) {
   return $request('basicData/queryDataDict2List', 'GET', {

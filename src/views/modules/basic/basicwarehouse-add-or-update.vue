@@ -100,6 +100,9 @@ import selectSeach from '@/components/erp-select/select-seach'
 import selectAll from '@/components/erp-select/select-all'
 // 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
+import { basicdataQuerycitybycountry, basicBasicchannelListcombobox, basicdataQueryallcountry, sysorganizationselect, dictWarehousePropertires } from '@/api/common/common.api'
+import { basicWarehouseInfo, basicWarehouseSave, basicWarehouseUpdate } from '@/api/basic/basic.js'
+
 export default {
   components: {
     selectSeach,
@@ -177,20 +180,13 @@ export default {
   },
   created () {
     // 对应店铺
-    this.$http
-      .get(this.$http.adornUrl('basic/basicchannel/listcombobox'))
-      .then(({ data }) => {
-        this.channelIdOptions = data.list
-      })
+    basicBasicchannelListcombobox().then(data => { this.channelIdOptions = data.list })
     // 所在国家
-    this.$http
-      .get(this.$http.adornUrl('/basicData/queryAllCountry'))
-      .then(({ data }) => {
-        this.countryOptions = data.countries
-      })
+    basicdataQueryallcountry().then(data => { this.countryOptions = data.countries })
     // 所属公司
-    this.$http.get(this.$http.adornUrl('/sys/organization/select')).then(({ data }) => { this.companyList = data.companyList })
-    this.getDataUrl()
+    sysorganizationselect().then(data => { this.companyList = data.companyList })
+    // 仓库属性
+    dictWarehousePropertires().then(data => { this.dictWarehouseOptions = data.fontMaps })
   },
   methods: {
     warehouseChange (value) {
@@ -215,16 +211,9 @@ export default {
         console.log('没有选择国家')
         return
       }
-      this.$http({
-        url: this.$http.adornUrl('basicData/queryCityByCountry'),
-        method: 'get',
-        params: this.$http.adornParams(
-          {
-            countryId: val
-          },
-          false
-        )
-      }).then(({ data }) => {
+      basicdataQuerycitybycountry({
+        countryId: val
+      }).then(data => {
         this.areaOptions = data.cities
       })
     },
@@ -242,16 +231,7 @@ export default {
         this.areaOptionsSelect(val)
       })
     },
-    getDataUrl () {
-      // 仓库属性
-      this.$http
-        .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-          params: { dataDictKey: 'WAREHOUSE_PROPERTIRES' }
-        })
-        .then(({ data }) => {
-          this.dictWarehouseOptions = data.fontMaps
-        })
-    },
+
     init (id, type) {
       this.dataForm.addTime = ''
       this.dataForm.addUser = ''
@@ -264,50 +244,47 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         if (id) {
-          this.$http({
-            url: this.$http.adornUrl(`basic/basicwarehouse/info/${id}`),
-            method: 'get',
-            params: this.$http.adornParams({}, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm = data.basicWarehouse
-              this.areaOptionsSelect(this.dataForm.country)
-              this.warehouseChange(this.dataForm.dictWarehousePropertires)
-            }
+          basicWarehouseInfo(id, true).then(data => {
+            this.dataForm = data.basicWarehouse
+            this.areaOptionsSelect(this.dataForm.country)
+            this.warehouseChange(this.dataForm.dictWarehousePropertires)
+          }).catch(e => {
+            this.notifyError(e.data.msg)
           })
         } else {
           this.warehouseChange()
         }
       })
     },
+    // 新增/编辑
+    basicwarehouseHttp () {
+      // 新增
+      if (!this.dataForm.id) {
+        basicWarehouseSave(this.dataForm).then((data) => {
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
+      // 编辑
+      if (this.dataForm.id) {
+        basicWarehouseUpdate(this.dataForm).then((data) => {
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
+    },
     // 表单提交
     dataFormSubmit: _.debounce(
       async function dataFormSubmit () {
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(
-                `basic/basicwarehouse/${!this.dataForm.id ? 'save' : 'update'}`
-              ),
-              method: `${!this.dataForm.id ? 'post' : 'put'}`,
-              data: this.$http.adornData(this.dataForm)
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.$emit('refreshDataList')
-                this.visible = false
-                this.$notify.success({
-                  title: '成功',
-                  message: '操作成功',
-                  duration: 1500
-                })
-              } else {
-                this.$notify.error({
-                  title: '错误',
-                  message: data.msg,
-                  duration: 5000
-                })
-              }
-            })
+            this.basicwarehouseHttp()
           }
         })
       }, 1000, {

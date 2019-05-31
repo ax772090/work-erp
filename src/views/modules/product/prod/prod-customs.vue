@@ -67,7 +67,7 @@ import selectAll from '@/components/erp-select/select-all'
 // 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
 import Bus from '@/components/js/bus.js'
-
+import { dictDictcurrencyListcombobox, dictDictunitListcombobox } from '@/api/common/common.api'
 export default {
   props: ['value'],
   components: {
@@ -102,9 +102,9 @@ export default {
   // mounted: {},
   created () {
     // 币种主键
-    this.$http.get(this.$http.adornUrl('dict/dictcurrency/listcombobox')).then(({ data }) => { this.currencyIdOptions = data.list })
+    dictDictcurrencyListcombobox().then(data => { this.currencyIdOptions = data.list })
     // 报关单位
-    this.$http.get(this.$http.adornUrl('/dict/dictunit/listcombobox')).then(({ data }) => { this.customsUnitIdOptions = data.list })
+    dictDictunitListcombobox().then(data => { this.customsUnitIdOptions = data.list })
   },
   methods: {
     init (id, type, handleType, dataForm) {

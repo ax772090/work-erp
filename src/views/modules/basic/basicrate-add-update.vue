@@ -71,6 +71,9 @@
 import selectSeach from '@/components/erp-select/select-seach'
 import selectAll from '@/components/erp-select/select-all'
 import { dateFormatter } from '@/utils/index.js'
+import { basicDataQueryAllCurrency, dictExchangeReteType } from '@/api/common/common.api'
+import { basicRateInfo, basicRateSave, basicRateUpdate } from '@/api/basic/basic.js'
+
 export default {
   components: {
     selectSeach,
@@ -139,20 +142,12 @@ export default {
   },
   created () {
     // 原币/本位币
-    this.$http.get(this.$http.adornUrl('/basicData/queryAllCurrency')).then(({ data }) => {
+    basicDataQueryAllCurrency().then(data => {
       this.originalCurrencyOptions = data.currencyList
       this.localCurrencyOptions = data.currencyList
     })
     // 汇率类型
-    this.$http({
-      url: this.$http.adornUrl('basicData/queryDataDict2List'),
-      method: 'get',
-      params: this.$http.adornParams({
-        dataDictKey: 'EXCHANGE_RETE_TYPE'
-      })
-    }).then(({ data }) => {
-      this.exchangeRateTypeOptions = data.fontMaps
-    })
+    dictExchangeReteType().then(data => { this.exchangeRateTypeOptions = data.fontMaps })
     this.$nextTick(() => {
       this.dataForm.effectiveDate = dateFormatter(new Date(), false)
       this.dataForm.expirationDate = dateFormatter(new Date(), false)
@@ -189,21 +184,10 @@ export default {
       })
       this.$nextTick(() => {
         if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(
-              `basic/exchangerate/info/${this.dataForm.id}`
-            ),
-            method: 'get'
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm = data.exchangeRateEntity
-            } else {
-              this.$notify.error({
-                title: '错误',
-                message: data.msg,
-                duration: 3000
-              })
-            }
+          basicRateInfo(this.dataForm.id, true).then(data => {
+            this.dataForm = data.exchangeRateEntity
+          }).catch(e => {
+            this.notifyError(e.data.msg)
           })
         }
       })
@@ -229,6 +213,29 @@ export default {
         this.islocalCurrency = false
       }
     },
+    // 新增/编辑
+    basicrateHttp () {
+      // 新增
+      if (!this.dataForm.id) {
+        basicRateSave(this.dataForm).then((data) => {
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
+      // 编辑
+      if (this.dataForm.id) {
+        basicRateUpdate(this.dataForm).then((data) => {
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
+    },
     // 保存
     save: _.debounce(
       async function save () {
@@ -243,30 +250,9 @@ export default {
               })
               return
             }
-            this.$http({
-              url: this.$http.adornUrl(
-                `basic/exchangerate/${this.dataForm.id ? 'update' : 'save'}`
-              ),
-              method: `${this.dataForm.id ? 'put' : 'post'}`,
-              data: this.dataForm
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.visible = false
-                this.$notify({
-                  type: 'success',
-                  title: '提示',
-                  message: `${!this.dataForm.id ? '新增' : '修改'}成功`,
-                  duration: 3000
-                })
-                this.$emit('refreshDataList')
-              } else {
-                this.$notify.error({
-                  title: '错误',
-                  message: data.msg,
-                  duration: 3000
-                })
-              }
-            })
+            this.basicrateHttp()
+          } else {
+            return false
           }
         })
       }, 1000, {

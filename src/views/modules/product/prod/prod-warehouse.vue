@@ -18,14 +18,16 @@
                         prop="minQty"
                         :rules="dataRule.isNotNegativeInteger">
             <el-input v-model="dataForm.minQty"
-                      type="Number"  @mousewheel.native.prevent
+                      type="Number"
+                      @mousewheel.native.prevent
                       :disabled="!dataForm.bMinStock"></el-input>
           </el-form-item>
           <el-form-item label="最大库存"
                         prop="maxQty"
                         :rules="dataRule.isNotNegativeInteger">
             <el-input v-model="dataForm.maxQty"
-                      type="Number"  @mousewheel.native.prevent
+                      type="Number"
+                      @mousewheel.native.prevent
                       :disabled="!dataForm.bMaxStock"></el-input>
           </el-form-item>
         </el-col>
@@ -83,6 +85,7 @@
 <script>
 import selectAll from '@/components/erp-select/select-all'
 import Bus from '@/components/js/bus.js'
+import { basicBasicwarehouseListcombobox, dictDictunitListcombobox, dictDateUnit } from '@/api/common/common.api'
 // const cityOptions = ['安全库存', '最小库存', '最大库存']
 export default {
   props: ['value'],
@@ -134,29 +137,14 @@ export default {
   },
   created () {
     // 默认仓库
-    this.$http
-      .get(this.$http.adornUrl('basic/basicwarehouse/listcombobox'))
-      .then(({ data }) => {
-        this.defaultWarehouseIdOptions = data.list
-      })
+    basicBasicwarehouseListcombobox().then(data => { this.defaultWarehouseIdOptions = data.list })
     // 库存单位
-    this.$http
-      .get(this.$http.adornUrl('dict/dictunit/listcombobox'))
-      .then(({ data }) => {
-        this.unitIdOptions = data.list
-      })
+    dictDictunitListcombobox().then(data => { this.unitIdOptions = data.list })
     // 保质期单位
-    this.$http
-      .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-        params: { dataDictKey: 'DATE_UNIT' }
-      })
-      .then(({ data }) => {
-        this.shelfLifeUnitIdOptions = data.fontMaps
-      })
+    dictDateUnit({ dataDictKey: 'DATE_UNIT' }).then(data => { this.shelfLifeUnitIdOptions = data.fontMaps })
   },
   methods: {
     init (id, type, handleType, dataForm) {
-      // 6
       this.dataForm.addTime = ''
       this.dataForm.addUser = ''
       this.dataForm.updTime = ''
@@ -292,5 +280,4 @@ export default {
   font-size: 20px;
   font-weight: 600;
 }
-
 </style>

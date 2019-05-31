@@ -173,6 +173,7 @@ import selectSeach from '@/components/erp-select/select-seach'
 import textareaAll from '@/components/erp-input/textarea-all'
 import Bus from '@/components/js/bus.js'
 import { isNull } from '@/utils'
+import { dictSaleStatus, dictProductProperties, basicBasicbrandListcombobox, dictDictunitListcombobox, dictDictcountryListcombobox } from '@/api/common/common.api'
 
 export default {
   props: ['value'],
@@ -275,13 +276,15 @@ export default {
   },
   created () {
     // 销售国家
-    this.$http.get(this.$http.adornUrl('dict/dictcountry/listcombobox')).then(({ data }) => { this.saleCountryIdOptions = data.list })
-    this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'SALE_STATUS' } }).then(({ data }) => { this.dictSaleStatusOptions = data.fontMaps })
-    this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'PRODUCT_PROPERTIES' } }).then(({ data }) => { this.dictProductPropertiesOption = data.fontMaps })
+    dictDictcountryListcombobox().then(data => { this.saleCountryIdOptions = data.list })
+    // 销售状态
+    dictSaleStatus().then(data => { this.dictSaleStatusOptions = data.fontMaps })
+    // 产品属性
+    dictProductProperties().then(data => { this.dictProductPropertiesOption = data.fontMaps })
     // 品牌
-    this.$http.get(this.$http.adornUrl('basic/basicbrand/listcombobox')).then(({ data }) => { this.brandIdOption = data.list })
+    basicBasicbrandListcombobox().then(data => { this.brandIdOption = data.list })
     // 产品单位
-    this.$http.get(this.$http.adornUrl('dict/dictunit/listcombobox')).then(({ data }) => { this.unitIdOption = data.list })
+    dictDictunitListcombobox().then(data => { this.unitIdOption = data.list })
   },
   computed: {
     computStringArray: {

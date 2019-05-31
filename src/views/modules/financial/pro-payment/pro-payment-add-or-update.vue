@@ -1,246 +1,299 @@
 <template>
-  <el-dialog :title="dialogTitle"
-             :close-on-click-modal="false"
-             :visible.sync="visible"
-             @close="$refs['dataForm'].resetFields()"
-             width="90%">
-    <!-- 审核头 -->
-    <approval-new v-model="approvalData"
-                  v-if='isApproval'></approval-new>
-    <el-form :model="dataForm"
-             ref="dataForm"
-             :rules="dataRule"
-             label-width="110px">
-      <el-row>
-        <el-col :span="6">
-          <el-form-item label="单据编号"
-                        prop="code">
-            <el-input v-model="dataForm.code"
-                      :disabled="true"
-                      placeholder="系统自动生成"></el-input>
-          </el-form-item>
-          <el-form-item label="单据类型"
-                        prop="docType">
-            <select-all v-model="dataForm.docType"
-                        :listDataOption="docTypeOption"
-                        :isDisabled="true"
-                        data-value="key"
-                        data-label="value"></select-all>
-          </el-form-item>
-          <el-form-item label="备注"
-                        prop="remarks">
-            <textarea-all v-model="dataForm.remarks"
-                          :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[0].key"></textarea-all>
-          </el-form-item>
+  <div class="pro-payment-add-or-update">
+    <el-dialog :title="dialogTitle"
+               :close-on-click-modal="false"
+               :visible.sync="visible"
+               @close="$refs['dataForm'].resetFields()"
+               width="90%">
+      <!-- 审核头 -->
+      <approval-new v-model="approvalData"
+                    v-if='isApproval'></approval-new>
+      <el-form :model="dataForm"
+               ref="dataForm"
+               :rules="dataRule"
+               label-width="110px">
+        <el-row>
+          <el-col :span="6">
+            <el-form-item label="单据编号"
+                          prop="code">
+              <el-input v-model="dataForm.code"
+                        :disabled="true"
+                        placeholder="系统自动生成"></el-input>
+            </el-form-item>
+            <el-form-item label="单据类型"
+                          prop="docType">
+              <select-all v-model="dataForm.docType"
+                          :listDataOption="docTypeOption"
+                          :isDisabled="true"
+                          data-value="key"
+                          data-label="value"></select-all>
+            </el-form-item>
+            <el-form-item label="备注"
+                          prop="remarks">
+              <textarea-all v-model="dataForm.remarks"
+                            :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[0].key"></textarea-all>
+            </el-form-item>
 
-        </el-col>
-        <el-col :span="6">
-          <el-form-item label="应付日期"
-                        :rules="dataRule.isRequired"
-                        prop="payableDate">
-            <el-date-picker v-model="dataForm.payableDate"
-                            type="date"
-                            format="yyyy-MM-dd"
-                            value-format="yyyy-MM-dd"
-                            :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[0].key"></el-date-picker>
-          </el-form-item>
-          <el-form-item label="供应商"
-                        :rules="dataRule.isRequired"
-                        prop="supplierId">
-            <select-seach v-model="dataForm.supplierId"
-                          httpUrl="list/search/supplier"
-                          httpMethod="get"
-                          data-label="name"
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="应付日期"
+                          :rules="dataRule.isRequired"
+                          prop="payableDate">
+              <el-date-picker v-model="dataForm.payableDate"
+                              type="date"
+                              format="yyyy-MM-dd"
+                              value-format="yyyy-MM-dd"
+                              :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[0].key"></el-date-picker>
+            </el-form-item>
+            <el-form-item label="供应商"
+                          :rules="dataRule.isRequired"
+                          prop="supplierId">
+              <select-seach v-model="dataForm.supplierId"
+                            httpUrl="list/search/supplier"
+                            httpMethod="get"
+                            data-label="name"
+                            data-value="id"
+                            data-source="list"
+                            :isDisabled="isCheck || isApproval || dataForm.finPoPayableDetailList.length>0"></select-seach>
+            </el-form-item>
+
+            <el-form-item label="应付公司"
+                          :rules="dataRule.isRequired"
+                          prop="compId">
+              <select-all v-model="dataForm.compId"
+                          :listDataOption="compIdOptions"
+                          :isDisabled="isCheck || isApproval || dataForm.finPoPayableDetailList.length>0"
                           data-value="id"
-                          data-source="list"
-                          :isDisabled="isCheck || isApproval || dataForm.finPoPayableDetailList.length>0"></select-seach>
-          </el-form-item>
+                          data-label="name"></select-all>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
 
-          <el-form-item label="应付公司"
-                        :rules="dataRule.isRequired"
-                        prop="compId">
-            <select-all v-model="dataForm.compId"
-                        :listDataOption="compIdOptions"
-                        :isDisabled="isCheck || isApproval || dataForm.finPoPayableDetailList.length>0"
-                        data-value="id"
-                        data-label="name"></select-all>
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
+            <el-form-item label="结算币种"
+                          :rules="dataRule.isRequired"
+                          prop="currencyId">
+              <select-all v-model="dataForm.currencyId"
+                          :listDataOption="currencyIdOptions"
+                          :isDisabled="isCheck || isApproval || dataForm.finPoPayableDetailList.length>0"
+                          data-value="id"
+                          data-label="name"></select-all>
+            </el-form-item>
 
-          <el-form-item label="结算币种"
-                        :rules="dataRule.isRequired"
-                        prop="currencyId">
-            <select-all v-model="dataForm.currencyId"
-                        :listDataOption="currencyIdOptions"
-                        :isDisabled="isCheck || isApproval || dataForm.finPoPayableDetailList.length>0"
-                        data-value="id"
-                        data-label="name"></select-all>
-          </el-form-item>
-
-          <el-form-item label="总金额"
-                        prop="totalAmount">
-            <el-input v-model="dataForm.totalAmount"
-                      type="Number"
-                      :disabled="true"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
-          <el-form-item label="源单据类型"
-                        prop="sourceType">
-            <select-all v-model="dataForm.sourceType"
-                        :listDataOption="sourceTypeOption"
-                        :isDisabled="true"
-                        data-value="key"
-                        data-label="value"></select-all>
-          </el-form-item>
-          <el-form-item label="源单据编号"
-                        prop="sourceCode">
-            <el-input v-model="dataForm.sourceCode"
-                      :disabled="true"
-                      placeholder="系统自动生成"></el-input>
-          </el-form-item>
-          <el-form-item label="单据状态"
-                        prop="dictDocStatus">
-            <select-all v-model="dataForm.dictDocStatus"
-                        :listDataOption="dictDocStatusOption"
-                        :isDisabled="true"
-                        data-value="key"
-                        data-label="value"></select-all>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <!-- ============================== 应付单 ============================= -->
-      <div>
-        <el-button type="text"
-                   v-if="!(isCheck ||isApproval ||  dataForm.docType === docTypeOption[0].key)"
-                   :disabled="isCheck"
-                   @click="detailAddHandle()">
-          <i class="iconfont erp-icon-tianjiamingxi"></i>添加明细行</el-button>
-        <el-table :data="dataForm.finPoPayableDetailList"
-                  stripe
-                  border
-                  max-height="800"
-                  highlight-current-row
-                  v-loading="dataListLoading"
-                  show-summary
-                  @selection-change="selectionChangeHandle"
-                  :summary-method="getSummaries"
-                  fit
-                  id="table__one"
-                  class="tableInfo">
-          <el-table-column label="采购合同号"
-                           prop="contractCode"
-                           width="150px"></el-table-column>
-          <el-table-column label="产品编码"
-                           prop="prodCode"
-                           width="120px"></el-table-column>
-          <el-table-column label="产品名称"
-                           prop="prodName"></el-table-column>
-          <el-table-column label="规格型号"
-                           prop="specifications"
-                           width="80px"></el-table-column>
-          <el-table-column label="单位"
-                           prop="unitName"
-                           width="50px"></el-table-column>
-          <el-table-column label="数量"
-                           prop="qty"
-                           min-width="30px">
-
-          </el-table-column>
-          <el-table-column label="单价"
-                           prop="price"
-                           min-width="30px">
-            <template slot-scope="scope">
-              <el-input v-model.number="scope.row.price"
+            <el-form-item label="总金额"
+                          prop="totalAmount">
+              <el-input v-model="dataForm.totalAmount"
                         type="Number"
-                        @input="priceHander(scope.row)"
-                        @mousewheel.native.prevent
-                        :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[1].key"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label="税率"
-                           prop="taxRate"
-                           min-width="30px">
-            <template slot-scope="scope">
-              <el-input v-model.number="scope.row.taxRate"
-                        type="Number"
-                        @input="taxRateHander(scope.row)"
-                        @mousewheel.native.prevent
-                        :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[1].key"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label="不含税金额"
-                           prop="noTaxAmount"
-                           width="100px"> </el-table-column>
-          <el-table-column label="税额"
-                           prop="taxAmount"
-                           min-width="20px"> </el-table-column>
-          <el-table-column label="汇率"
-                           prop="exchangeRate"
-                           min-width="20px"></el-table-column>
-          <el-table-column :label="dataForm.docType === docTypeOption[1].key ? '调整金额' : '总金额'"
-                           prop="totalAmount"
-                           min-width="30px">
-            <template slot-scope="scope">
-              <el-form-item :prop="'finPoPayableDetailList[' + scope.$index + '].totalAmount'"
-                            :rules="dataRule.totalAmount"
-                            label-width="0px">
-                <el-input v-model.number="scope.row.totalAmount"
+                        :disabled="true"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6">
+            <el-form-item label="源单据类型"
+                          prop="sourceType">
+              <select-all v-model="dataForm.sourceType"
+                          :listDataOption="sourceTypeOption"
+                          :isDisabled="true"
+                          data-value="key"
+                          data-label="value"></select-all>
+            </el-form-item>
+            <el-form-item label="源单据编号"
+                          prop="sourceCode">
+              <el-input v-model="dataForm.sourceCode"
+                        :disabled="true"
+                        placeholder="系统自动生成"></el-input>
+            </el-form-item>
+            <el-form-item label="单据状态"
+                          prop="dictDocStatus">
+              <select-all v-model="dataForm.dictDocStatus"
+                          :listDataOption="dictDocStatusOption"
+                          :isDisabled="true"
+                          data-value="key"
+                          data-label="value"></select-all>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <!-- ============================== 应付单 ============================= -->
+        <div>
+          <el-button type="text"
+                     v-if="!(isCheck ||isApproval ||  dataForm.docType === docTypeOption[0].key)"
+                     :disabled="isCheck"
+                     @click="detailAddHandle()">
+            <i class="iconfont erp-icon-tianjiamingxi"></i>添加明细行</el-button>
+          <el-table :data="dataForm.finPoPayableDetailList"
+                    stripe
+                    border
+                    max-height="800"
+                    highlight-current-row
+                    v-loading="dataListLoading"
+                    show-summary
+                    @selection-change="selectionChangeHandle"
+                    :summary-method="getSummaries"
+                    fit
+                    id="table__one"
+                    class="tableInfo">
+            <el-table-column label="采购合同号"
+                             prop="contractCode"
+                             width="150px"></el-table-column>
+            <el-table-column label="产品编码"
+                             prop="prodCode"
+                             width="120px"></el-table-column>
+            <el-table-column label="产品名称"
+                             prop="prodName"></el-table-column>
+            <el-table-column label="规格型号"
+                             prop="specifications"
+                             width="80px"></el-table-column>
+            <el-table-column label="单位"
+                             prop="unitName"
+                             width="50px"></el-table-column>
+            <el-table-column label="数量"
+                             prop="qty"
+                             min-width="30px"></el-table-column>
+            <el-table-column label="单价"
+                             prop="price"
+                             width="140px">
+              <template slot-scope="scope">
+                <div v-if="dataForm.docType === docTypeOption[0].key">
+                  原: &nbsp; {{scope.row.origPrice}}
+                </div>
+                <span v-if="dataForm.docType === docTypeOption[0].key">现:</span>
+                <el-input v-model.number="scope.row.price"
                           type="Number"
-                          @input="totalAmountHander(scope.row)"
+                          @input="priceHander(scope.row)"
                           @mousewheel.native.prevent
-                          :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[0].key"></el-input>
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column label="调整原因"
-                           prop="remark"
-                           min-width="50px">
-            <template slot-scope="scope">
-              <el-form-item :prop="'finPoPayableDetailList[' + scope.$index + '].remark'"
-                            :rules="dataForm.docType === docTypeOption[1].key ? dataRule.isRequired : dataRule.isNO"
-                            label-width="0px">
-                <textarea-all v-model="scope.row.remark"
-                              :disabled="isCheck || isApproval"></textarea-all>
-              </el-form-item>
-            </template>
-          </el-table-column>
-          <el-table-column v-if="!(isCheck || isApproval || dataForm.docType === docTypeOption[0].key)"
-                           width="80"
-                           fixed="right"
-                           label="操作">
-            <template slot-scope="scope">
-              <el-button type="danger"
-                         size="small"
-                         circle
-                         title="删除"
-                         @click="deleteHandle(scope)">
-                <i class="iconfont erp-icon-shanchu"></i>
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+                          :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[1].key"
+                          class="w-input"></el-input>
+                <div v-if="dataForm.docType === docTypeOption[0].key">
+                  差异: &nbsp; {{scope.row.priceDiff}}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="税率"
+                             prop="taxRate"
+                             width="140px">
+              <template slot-scope="scope">
+                <div v-if="dataForm.docType === docTypeOption[0].key">
+                  原: &nbsp; {{scope.row.origTaxRate}}
+                </div>
+                <div>
+                  <span v-if="dataForm.docType === docTypeOption[0].key">现:</span>
+                  <el-input v-model.number="scope.row.taxRate"
+                            type="Number"
+                            @input="taxRateHander(scope.row)"
+                            @mousewheel.native.prevent
+                            :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[1].key"
+                            class="w-input"></el-input>
+                </div>
+                <div v-if="dataForm.docType === docTypeOption[0].key">
+                  差异: &nbsp; {{scope.row.taxRateDiff}}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="不含税金额"
+                             prop="noTaxAmount"
+                             width="120px">
+              <template slot-scope="scope">
+                <div v-if="dataForm.docType === docTypeOption[0].key">
+                  原: &nbsp; {{scope.row.origNoTaxAmount}}
+                </div>
+                <div>
+                  <span v-if="dataForm.docType === docTypeOption[0].key">现:</span>
+                  &nbsp; {{scope.row.noTaxAmount}}
+                </div>
+                <div v-if="dataForm.docType === docTypeOption[0].key">
+                  差异: &nbsp; {{scope.row.noTaxDiff}}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="税额"
+                             prop="taxAmount"
+                             width="120px">
+              <template slot-scope="scope">
+                <div v-if="dataForm.docType === docTypeOption[0].key">
+                  原: &nbsp; {{scope.row.origTaxAmount}}
+                </div>
+                <div>
+                  <span v-if="dataForm.docType === docTypeOption[0].key">现:</span>
+                  &nbsp; {{scope.row.taxAmount}}
+                </div>
+                <div v-if="dataForm.docType === docTypeOption[0].key">
+                  差异: &nbsp; {{scope.row.taxDiff}}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="汇率"
+                             prop="exchangeRate"
+                             width="40px"></el-table-column>
+            <el-table-column :label="dataForm.docType === docTypeOption[1].key ? '调整金额' : '总金额'"
+                             prop="totalAmount"
+                             width="150px">
+              <template slot-scope="scope">
+                <div v-if="dataForm.docType === docTypeOption[0].key">
+                  原: &nbsp; {{scope.row.origTotalAmount}}
+                </div>
+                <div>
+                  <el-form-item :prop="'finPoPayableDetailList[' + scope.$index + '].totalAmount'"
+                                :rules="dataRule.totalAmount"
+                                :label-width="dataForm.docType === docTypeOption[0].key ? '40px' : '0px'"
+                                :label="dataForm.docType === docTypeOption[0].key ? '现:' : ''">
+                    <el-input v-model.number="scope.row.totalAmount"
+                              type="Number"
+                              @input="totalAmountHander(scope.row)"
+                              @mousewheel.native.prevent
+                              :disabled="isCheck || isApproval || dataForm.docType === docTypeOption[0].key"></el-input>
+                  </el-form-item>
+                </div>
+                <div v-if="dataForm.docType === docTypeOption[0].key">
+                  差异: &nbsp; {{scope.row.totalDiff}}
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="调整原因"
+                             prop="remark"
+                             min-width="50px">
+              <template slot-scope="scope">
+                <el-form-item :prop="'finPoPayableDetailList[' + scope.$index + '].remark'"
+                              :rules="dataForm.docType === docTypeOption[1].key ? dataRule.isRequired : dataRule.isNO"
+                              label-width="0px">
+                  <textarea-all v-model="scope.row.remark"
+                                :disabled="isCheck || isApproval"></textarea-all>
+                </el-form-item>
+              </template>
+            </el-table-column>
+            <el-table-column v-if="!(isCheck || isApproval || dataForm.docType === docTypeOption[0].key)"
+                             width="80"
+                             fixed="right"
+                             label="操作">
+              <template slot-scope="scope">
+                <el-button type="danger"
+                           size="small"
+                           circle
+                           title="删除"
+                           @click="deleteHandle(scope)">
+                  <i class="iconfont erp-icon-shanchu"></i>
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
 
-      </div>
-    </el-form>
-    <span slot="footer"
-          class="dialog-footer">
-      <el-button @click="visible = false"><i class="iconfont erp-icon-quxiao"></i>取消</el-button>
-      <el-button v-if="isAdd"
-                 type="primary"
-                 @click="dataFormSave()"><i class="iconfont erp-icon-baocun"></i>保存</el-button>
-      <el-button v-if="isAuth('fin:finpopayable:submit') && isAdd"
-                 type="primary"
-                 @click="workflowSubmit()"><i class="iconfont erp-icon-queding"></i>提交</el-button>
-      <el-button type="primary"
-                 v-if="isApproval"
-                 @click="approvalHander()"><i class="iconfont erp-icon-shenhe"></i>审核</el-button>
-    </span>
-    <!-- 添加明细 -->
-    <add-details ref="addDetails"
-                 @addDetailsList="addList"></add-details>
-  </el-dialog>
+        </div>
+      </el-form>
+      <span slot="footer"
+            class="dialog-footer">
+        <el-button @click="visible = false"><i class="iconfont erp-icon-quxiao"></i>取消</el-button>
+        <el-button v-if="isAdd"
+                   type="primary"
+                   @click="dataFormSave()"><i class="iconfont erp-icon-baocun"></i>保存</el-button>
+        <el-button v-if="isAuth('fin:finpopayable:submit') && isAdd"
+                   type="primary"
+                   @click="workflowSubmit()"><i class="iconfont erp-icon-queding"></i>提交</el-button>
+        <el-button type="primary"
+                   v-if="isApproval"
+                   @click="approvalHander()"><i class="iconfont erp-icon-shenhe"></i>审核</el-button>
+      </span>
+      <!-- 添加明细 -->
+      <add-details ref="addDetails"
+                   @addDetailsList="addList"></add-details>
+    </el-dialog>
+  </div>
 </template>
 <script>
 // 应付单页面
@@ -381,20 +434,7 @@ export default {
 
     // 新增
     initAdd () {
-      for (const key in this.dataForm) {
-        if (this.dataForm.hasOwnProperty(key)) {
-          const element = this.dataForm[key]
-          if (hasTypeOf(element) === 'array') {
-            this.dataForm[key] = []
-          } else if (hasTypeOf(element) === 'object') {
-            this.dataForm[key] = {}
-          } else if (hasTypeOf(element) === 'null') {
-            this.dataForm[key] = null
-          } else {
-            this.dataForm[key] = ''
-          }
-        }
-      }
+      hasTypeOf(this.dataForm)
       this.dataForm.docType = '02'
       this.dataForm.payableDate = dateFormatter(new Date(), false)
       this.dataForm.dictDocStatus = this.dictDocStatusOption[0].key
@@ -762,3 +802,10 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.w-input {
+  width: 100px;
+  max-width: 100%;
+}
+</style>

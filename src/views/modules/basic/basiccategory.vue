@@ -91,7 +91,7 @@ import erpSearchPanel from '@/components/erp-search-panel'
 import paginationAll from '@/components/erp-pagination/pagination-all'
 import AddOrUpdate from './basiccategory-add-or-update'
 import { initData } from '@/mixins/initData.js'
-import { basicCategoryList, basicCategoryActiveOrDis } from '@/api/basic/basic.js'
+import { basicCategoryList, basicCategoryActiveOrDis } from '@/api/basic/basic'
 export default {
   mixins: [initData],
   components: {
@@ -129,6 +129,7 @@ export default {
   created () {
     this.getDataList()
   },
+  
   methods: {
     // 获取选中的下拉数据
     searchOptionsChange (data) {
@@ -182,10 +183,12 @@ export default {
         this.paginationData.totalCount = 0
       })
     },
+
     // 多选
     selectionChangeHandle (val) {
       this.dataListSelections = val
     },
+
     // 新增 / 修改
     addOrUpdateHandle (id, type) {
       this.addOrUpdateVisible = true

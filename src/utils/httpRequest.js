@@ -3,6 +3,7 @@ import axios from 'axios'
 import router from '@/router'
 import qs from 'qs' // JSON.stringify和JSON.parse会有双引号
 import merge from 'lodash/merge' // Lodash.js：实用的工具库
+// import { showLoading, hideLoading } from '@/components/erp-loading/loading'
 
 const http = axios.create({
   timeout: 1000 * 30,
@@ -16,6 +17,7 @@ const http = axios.create({
  * 请求拦截
  */
 http.interceptors.request.use(config => {
+  // showLoading()
   config.headers['token'] = Vue.cookie.get('token') // 请求头带上token
   return config
 }, error => {
@@ -26,6 +28,7 @@ http.interceptors.request.use(config => {
  * 响应拦截
  */
 http.interceptors.response.use(response => {
+  // hideLoading()
   if (response.data && response.data.code === 401) { // 401, token失效
     Vue.cookie.delete('token')
     router.options.isAddDynamicMenuRoutes = false
@@ -46,6 +49,7 @@ http.interceptors.response.use(response => {
   // }
   return response
 }, error => {
+  // hideLoading()
   console.log(error)
   return Promise.reject(error)
 })

@@ -154,7 +154,7 @@
 <script>
 import selectAll from '@/components/erp-select/select-all'
 import Bus from '@/components/js/bus.js'
-
+import { dictDictcurrencyListcombobox, dictDictunitListcombobox, dictProductUnit } from '@/api/common/common.api'
 export default {
   name: 'proddevSupport',
   props: ['value'],
@@ -252,25 +252,17 @@ export default {
 
   created () {
     // 空运币种
-    this.$http.get(this.$http.adornUrl('dict/dictcurrency/listcombobox')).then(({ data }) => {
+    dictDictcurrencyListcombobox().then(data => {
       this.airCurrencyIdOptions = data.list
       this.seaCurrencyIdOptions = data.list
     })
-    // 海运币种
-    this.$http.get(this.$http.adornUrl('dict/dictcurrency/listcombobox')).then(res => { })
-    //   整箱单位
-    this.$http.get(this.$http.adornUrl('/dict/dictunit/listcombobox')).then(({ data }) => { this.outboxUnitIdOptions = data.list })
+    // 整箱单位
+    dictDictunitListcombobox().then(data => { this.outboxUnitIdOptions = data.list })
   },
   methods: {
     init (id, type, handleType) {
       // 长度单位
-      this.$http
-        .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-          params: { dataDictKey: 'PRODUCT_UNIT' }
-        })
-        .then(({ data }) => {
-          this.prodUnitOption = data.fontMaps
-        })
+      dictProductUnit({ dataDictKey: 'PRODUCT_UNIT' }).then(data => { this.prodUnitOption = data.fontMaps })
       this.dataForm.prodUnit = '01'
       this.dataForm.inboxUnit = '01'
       // 1

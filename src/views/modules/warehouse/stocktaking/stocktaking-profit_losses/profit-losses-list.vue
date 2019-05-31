@@ -86,7 +86,7 @@
       <el-table-column prop="confirmTime"
                        label="确认时间"
                        sortable></el-table-column>
-      <el-table-column label="操作"
+      <!-- <el-table-column label="操作"
                        fixed="right"
                        width="80">
         <template slot-scope="scope">
@@ -97,7 +97,7 @@
                      @click="print(scope.row.id)">
             <i class="iconfont erp-icon-dayin"></i></el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <!-- 分页 -->
     <el-row>
@@ -132,48 +132,42 @@ export default {
       // 数据过滤器
       searchData: {},
       // 搜索下拉
-      searchOptions: [
-        {
-          label: '单号',
-          value: 'code',
-          inputType: 'el-input'
-        },
-        {
-          label: '盘点单号',
-          value: 'stocktakingCode',
-          inputType: 'el-input'
-        },
-        {
-          label: '仓库',
-          value: 'warehouseId',
-          inputType: 'el-select',
+      searchOptions: [{
+        label: '单号',
+        value: 'code',
+        inputType: 'el-input'
+      }, {
+        label: '盘点单号',
+        value: 'stocktakingCode',
+        inputType: 'el-input'
+      }, {
+        label: '仓库',
+        value: 'warehouseId',
+        inputType: 'el-select',
 
-          httpUrl: 'list/combobox/warehouse',
-          dataSource: 'list',
-          title: 'warehouseIdList',
-          dataValue: 'id',
-          dataLabel: 'name',
-          placeholder: '仓库'
-        },
-        {
-          label: '盘点日期',
-          value: 'dateRange',
-          inputType: 'el-daterangeArr'
-        },
-        {
-          label: '单据类型',
-          value: 'symbol',
-          inputType: 'el-select',
+        httpUrl: 'list/combobox/warehouse',
+        dataSource: 'list',
+        title: 'warehouseIdList',
+        dataValue: 'id',
+        dataLabel: 'name',
+        placeholder: '仓库'
+      }, {
+        label: '盘点日期',
+        value: 'dateRange',
+        inputType: 'el-daterangeArr'
+      }, {
+        label: '单据类型',
+        value: 'symbol',
+        inputType: 'el-select',
 
-          httpUrl: 'basicData/queryDataDict2List',
-          requestParams: { dataDictKey: 'PROFIT_LOSSES_SYMBOL' },
-          dataSource: 'fontMaps',
-          title: 'symbol',
-          dataValue: 'key',
-          dataLabel: 'value',
-          placeholder: '单据类型'
-        }
-      ],
+        httpUrl: 'basicData/queryDataDict2List',
+        requestParams: { dataDictKey: 'PROFIT_LOSSES_SYMBOL' },
+        dataSource: 'fontMaps',
+        title: 'symbol',
+        dataValue: 'key',
+        dataLabel: 'value',
+        placeholder: '单据类型'
+      }],
       dataForm: {},
       dataList: [],
       dataListLoading: false,
@@ -216,11 +210,7 @@ export default {
       this.$http({
         url: this.$http.adornUrl('warehouse/whprofitlosses/list'),
         method: 'post',
-        data: Object.assign(
-          {},
-          this.paginationData,
-          this.searchData === undefined ? {} : this.searchData
-        )
+        data: Object.assign({}, this.paginationData, this.searchData === undefined ? {} : this.searchData)
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.dataList = data.pageList.dataList

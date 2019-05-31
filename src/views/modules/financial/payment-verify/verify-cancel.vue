@@ -267,7 +267,7 @@ export default {
       if (!isVerify) {
         this.$notify.warning({
           title: '警告',
-          message: '核销类型为[付款核销]的单据不能进行反核销，请重新选择！',
+          message: '核销类型为[自动核销]的单据不能进行反核销，请重新选择！',
           duration: 3000
         })
       } else {

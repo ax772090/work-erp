@@ -66,7 +66,7 @@
                           data-label="name"
                           data-value="id"
                           data-source="list"
-                          placeholder='选择供应商'
+                          placeholder='搜索供应商'
                           isSelectChange="true"
                           @selectChange="requireChange"></select-seach>
           </el-form-item>

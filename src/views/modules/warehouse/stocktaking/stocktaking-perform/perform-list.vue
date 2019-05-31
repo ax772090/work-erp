@@ -155,61 +155,54 @@ export default {
       // 时间过滤
       expectDate: '',
       // 下拉
-      searchOptions: [
-        {
-          label: '盘点员',
-          value: 'stockUserId',
-          inputType: 'el-select-remote',
+      searchOptions: [{
+        label: '盘点员',
+        value: 'stockUserId',
+        inputType: 'el-select-remote',
 
-          httpUrl: '/list/search/user',
-          queryKey: 'name',
-          dataSource: 'list',
-          title: 'stockUserId',
-          dataValue: 'id',
-          dataLabel: 'name',
-          placeholder: '盘点员'
-        },
-        {
-          label: '盘点编号',
-          value: 'code',
-          inputType: 'el-input'
-        },
-        {
-          label: '方案编号',
-          value: 'projectCode',
-          inputType: 'el-input'
-        },
-        {
-          label: '盘点日期',
-          value: 'dateRange',
-          inputType: 'el-daterangeArr'
-        },
-        {
-          label: '单据状态',
-          value: 'dictDocStatus',
-          inputType: 'el-select',
+        httpUrl: '/list/search/user',
+        queryKey: 'name',
+        dataSource: 'list',
+        title: 'stockUserId',
+        dataValue: 'id',
+        dataLabel: 'name',
+        placeholder: '盘点员'
+      }, {
+        label: '盘点编号',
+        value: 'code',
+        inputType: 'el-input'
+      }, {
+        label: '方案编号',
+        value: 'projectCode',
+        inputType: 'el-input'
+      }, {
+        label: '盘点日期',
+        value: 'dateRange',
+        inputType: 'el-daterangeArr'
+      }, {
+        label: '单据状态',
+        value: 'dictDocStatus',
+        inputType: 'el-select',
 
-          httpUrl: 'basicData/queryDataDict2List',
-          requestParams: { dataDictKey: 'APPROVAL_STATUS' },
-          dataSource: 'fontMaps',
-          title: 'dictDocStatusList',
-          dataValue: 'key',
-          dataLabel: 'value',
-          placeholder: '单据状态'
-        },
-        {
-          label: '库存公司',
-          value: 'compId',
-          inputType: 'el-select',
+        httpUrl: 'basicData/queryDataDict2List',
+        requestParams: { dataDictKey: 'APPROVAL_STATUS' },
+        dataSource: 'fontMaps',
+        title: 'dictDocStatusList',
+        dataValue: 'key',
+        dataLabel: 'value',
+        placeholder: '单据状态'
+      }, {
+        label: '库存公司',
+        value: 'compId',
+        inputType: 'el-select',
 
-          httpUrl: 'sys/organization/select',
-          dataSource: 'companyList',
-          title: 'compIdList',
-          dataValue: 'orgId',
-          dataLabel: 'name',
-          placeholder: '库存公司'
-        }
-      ],
+        httpUrl: 'sys/organization/select',
+        dataSource: 'companyList',
+        title: 'compIdList',
+        dataValue: 'orgId',
+        dataLabel: 'name',
+        placeholder: '库存公司'
+      }],
 
       dataList: [],
       dataForm: {},
@@ -245,12 +238,7 @@ export default {
       this.$http({
         url: this.$http.adornUrl('warehouse/whstocktaking/list'),
         method: 'post',
-        data: Object.assign(
-          {},
-          this.paginationData,
-          this.searchData === undefined ? {} : this.searchData,
-          searchValue
-        )
+        data: Object.assign({}, this.paginationData, this.searchData === undefined ? {} : this.searchData, searchValue)
       }).then(({ data }) => {
         if (data && data.code === 0) {
           this.dataList = data.pageList.dataList
@@ -272,12 +260,7 @@ export default {
       }
       // 批量审批
       this.dataListSelections.every((item, index, arr) => {
-        return (
-          arr[0].node === arr[index].node && arr[index].node
-        )
-      })
-        ? (this.isbatchReview = false)
-        : (this.isbatchReview = true)
+        return (arr[0].node === arr[index].node && arr[index].node)      }) ? (this.isbatchReview = false) : (this.isbatchReview = true)
     },
 
     // 新增 / 修改
@@ -300,11 +283,7 @@ export default {
         }
       }
       this.$nextTick(() => {
-        this.$refs.performAddorupdate.init(
-          row.id,
-          type,
-          obj
-        )
+        this.$refs.performAddorupdate.init(row.id, type, obj)
       })
     },
 
@@ -324,20 +303,14 @@ export default {
     // 导入
     ImportFile () {
       this.$nextTick(() => {
-        this.$refs.xlsImport.init({
-          templateUrl: '12333',
-          importUrl: '12333'
-        })
+        this.$refs.xlsImport.init({ templateUrl: '12333', importUrl: '12333' })
       })
     },
 
     // 导出
     exportFile () {
       window.open(
-        this.$http.tokens(
-          'warehouse/whinvewhstocktakingntory/export',
-          this.searchData
-        )
+        this.$http.tokens('warehouse/whinvewhstocktakingntory/export', this.searchData)
       )
     },
 

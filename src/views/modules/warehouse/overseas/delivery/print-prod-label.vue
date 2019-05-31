@@ -104,6 +104,7 @@ export default {
           //   newWindow.close()
           // })
           window.open(this.$http.tokens(`warehouse/whdeliveryplan/getSkuLabel`, this.dataForm))
+          this.visible = false
         } else {
           return false
         }

@@ -118,6 +118,8 @@ import selectAll from '@/components/erp-select/select-all'
 import { isEmail, isMobile } from '@/utils/validate'
 // 备注
 import textareaAll from '@/components/erp-input/textarea-all.vue'
+import { basicdataQueryallcountry, sysorganizationselect, dictPlantformType, dictCustomerType, dictCustomerLevel, dictInvoiceType, basicdataQuerycitybycountry } from '@/api/common/common.api'
+import { basicCustomerList, basicCustomerInfo, basicCustomerSave, basicCustomerUpdate } from '@/api/basic/basic.js'
 export default {
   components: {
     selectSeach,
@@ -173,81 +175,31 @@ export default {
   },
   created () {
     // 所在国家
-    this.$http
-      .get(this.$http.adornUrl('/basicData/queryAllCountry'))
-      .then(({ data }) => {
-        this.dictCountryOptions = data.countries
-      })
+    basicdataQueryallcountry().then(data => { this.dictCountryOptions = data.countries })
+    // this.$http
+    //   .get(this.$http.adornUrl('/basicData/queryAllCountry'))
+    //   .then(({ data }) => {
+    //     this.dictCountryOptions = data.countries
+    //   })
     this.$nextTick(() => {
-      this.comp() // 对应结算公司
-      this.queryDataDict2List('PLANTFORM_TYPE') // 来源平台
-      this.queryDataDict2List('CUSTOMER_TYPE') // 客户类型
-      this.queryDataDict2List('CUSTOMER_LEVEL') // 客户等级
-      this.queryDataDict2List('INVOICE_TYPE') // 发票类型
+      sysorganizationselect().then(data => { this.compIdOption = data.companyList })// 对应结算公司
+      dictPlantformType().then(data => { this.dictPlatformTypeOptions = data.fontMaps }) // 来源平台
+      dictCustomerType().then(data => { this.dictCustomerTypeOptions = data.fontMaps }) // 客户类型
+      dictCustomerLevel().then(data => { this.dictCustomerLevelOptions = data.fontMaps })  // 客户等级
+      dictInvoiceType().then(data => { this.dictInvoiceTypeOptions = data.fontMaps }) // 发票类型
     })
   },
   methods: {
-    // 查询数据字典
-    queryDataDict2List (dataDictKey) {
-      this.$http({
-        url: this.$http.adornUrl('basicData/queryDataDict2List'),
-        method: 'get',
-        params: this.$http.adornParams({
-          dataDictKey: dataDictKey
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          if (dataDictKey == 'PLANTFORM_TYPE') {
-            this.dictPlatformTypeOptions = data.fontMaps // 来源平台
-          } else if (dataDictKey == 'CUSTOMER_TYPE') {
-            this.dictCustomerTypeOptions = data.fontMaps // 客户类型
-          } else if (dataDictKey == 'CUSTOMER_LEVEL') {
-            this.dictCustomerLevelOptions = data.fontMaps // 客户等级
-          } else if (dataDictKey == 'INVOICE_TYPE') {
-            this.dictInvoiceTypeOptions = data.fontMaps // 发票类型
-          }
-        }
-      })
-    },
-    // 结算公司
-    comp () {
-      this.$http
-        .get(this.$http.adornUrl('sys/organization/select'))
-        .then(({ data }) => {
-          this.compIdOption = data.companyList
-        })
-    },
     // 城市
     areaOptionsSelect (val, type) {
       if (type) {
-        this.$http({
-          url: this.$http.adornUrl('basicData/queryCityByCountry'),
-          method: 'get',
-          params: this.$http.adornParams(
-            {
-              countryId: val
-            },
-            false
-          )
-        }).then(({ data }) => {
-          this.dictCityOptions = data.cities
-        })
+        basicdataQuerycitybycountry({ countryId: val }).then(data => { this.dictCityOptions = data.cities })
       } else {
         this.dataForm.dictCityId = ''
-        this.$http({
-          url: this.$http.adornUrl('basicData/queryCityByCountry'),
-          method: 'get',
-          params: this.$http.adornParams(
-            {
-              countryId: val
-            },
-            false
-          )
-        }).then(({ data }) => {
-          this.dictCityOptions = data.cities
-        })
+        basicdataQuerycitybycountry({ countryId: val }).then(data => { this.dictCityOptions = data.cities })
       }
     },
+
     // 国家改变
     dictCountryIdChange (val) {
       if (!this.dataForm.id || this.isOne) {
@@ -256,6 +208,7 @@ export default {
       }
       this.areaOptionsSelect(val)
     },
+
     // 编辑页面
     editor (type) {
       // 编辑时，锁定客户编码
@@ -265,6 +218,7 @@ export default {
         this.isSave = false
       }
     },
+
     // 新增页面
     add () {
       if (!this.dataForm.id) {
@@ -302,20 +256,11 @@ export default {
       })
       this.$nextTick(() => {
         if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(`basic/customer/info/${this.dataForm.id}`),
-            method: 'get'
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm = data.basicCustomer
-              this.areaOptionsSelect(this.dataForm.dictCountryId, 'init')
-            } else {
-              this.$notify.error({
-                title: '错误',
-                message: data.msg,
-                duration: 3000
-              })
-            }
+          basicCustomerInfo(this.dataForm.id, true).then(data => {
+            this.dataForm = data.basicCustomer
+            this.areaOptionsSelect(this.dataForm.dictCountryId, 'init')
+          }).catch(e => {
+            this.notifyError(e.data.msg)
           })
         }
       })
@@ -327,102 +272,46 @@ export default {
           if (valid) {
             // 编辑时，锁定客户编码，客户名称不做校验;新增时，校验客户名称是否相同
             if (!this.dataForm.id) {
-              this.$http({
-                url: this.$http.adornUrl('basic/customer/list'),
-                method: 'get',
-                params: { name: this.dataForm.name }
-              }).then(({ data }) => {
-                if (data && data.code === 0) {
-                  if (data.pageList.dataList.length > 0) {
-                    this.$confirm(
-                      '存在重复的客户名称，是否继续保存？',
-                      '提示',
-                      {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                      }
-                    ).then(() => {
-                      this.$http({
-                        url: this.$http.adornUrl('basic/customer/save'),
-                        method: 'post',
-                        data: this.dataForm
-                      }).then(({ data }) => {
-                        if (data && data.code === 0) {
-                          this.visible = false
-                          this.$notify({
-                            type: 'success',
-                            title: '提示',
-                            message: '新增',
-                            duration: 3000
-                          })
-                          this.$emit('refreshDataList')
-                        } else {
-                          this.$notify.error({
-                            title: '错误',
-                            message: data.msg,
-                            duration: 3000
-                          })
-                        }
-                      })
+              basicCustomerList({ name: this.dataForm.name }).then((data) => {
+                if (data.pageList.dataList.length > 0) {
+                  this.$confirm(
+                    '存在重复的客户名称，是否继续保存？',
+                    '提示',
+                    {
+                      confirmButtonText: '确定',
+                      cancelButtonText: '取消',
+                      type: 'warning'
+                    }
+                  ).then(() => {
+                    basicCustomerSave(this.dataForm).then((data) => {
+                      this.notifySuccess('操作成功')
+                      this.$emit('refreshDataList')
+                      this.visible = false
+                    }).catch((error) => {
+                      this.notifyError(error.data.msg)
                     })
-                    // 如果dataList.length = 0，则不存在客户的名称相同，直接可以保存
-                  } else {
-                    this.$http({
-                      url: this.$http.adornUrl('basic/customer/save'),
-                      method: 'post',
-                      data: this.dataForm
-                    }).then(({ data }) => {
-                      if (data && data.code === 0) {
-                        this.visible = false
-                        this.$notify({
-                          type: 'success',
-                          title: '提示',
-                          message: '新增成功',
-                          duration: 3000
-                        })
-                        this.$emit('refreshDataList')
-                      } else {
-                        this.$notify.error({
-                          title: '错误',
-                          message: data.msg,
-                          duration: 3000
-                        })
-                      }
-                    })
-                  }
-                  // 请求失败
+                  })
+                  // 如果dataList.length = 0，则不存在客户的名称相同，直接可以保存
                 } else {
-                  this.$notify.error({
-                    title: '错误',
-                    message: data.msg,
-                    duration: 3000
+                  basicCustomerSave(this.dataForm).then((data) => {
+                    this.notifySuccess('操作成功')
+                    this.$emit('refreshDataList')
+                    this.visible = false
+                  }).catch((error) => {
+                    this.notifyError(error.data.msg)
                   })
                 }
+              }).catch(() => {
+
               })
               // 编辑时不用校验客户的名称是否相同
             } else {
-              this.$http({
-                url: this.$http.adornUrl('basic/customer/update'),
-                method: 'put',
-                data: this.dataForm
-              }).then(({ data }) => {
-                if (data && data.code === 0) {
-                  this.visible = false
-                  this.$notify({
-                    type: 'success',
-                    title: '提示',
-                    message: '修改成功',
-                    duration: 3000
-                  })
-                  this.$emit('refreshDataList')
-                } else {
-                  this.$notify.error({
-                    title: '错误',
-                    message: data.msg,
-                    duration: 3000
-                  })
-                }
+              basicCustomerUpdate(this.dataForm).then((data) => {
+                this.visible = false
+                this.notifySuccess('操作成功')
+                this.$emit('refreshDataList')
+              }).catch((error) => {
+                this.notifyError(error.data.msg)
               })
             }
           }

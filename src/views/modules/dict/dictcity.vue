@@ -80,6 +80,8 @@ import erpSearchPanel from '@/components/erp-search-panel'
 import paginationAll from '@/components/erp-pagination/pagination-all'
 import AddOrUpdate from './dictcity-add-or-update'
 import { initData } from '@/mixins/initData.js'
+import { dictcityList } from '@/api/basic/basic.js'
+
 export default {
   mixins: [initData],
   components: {
@@ -154,30 +156,14 @@ export default {
         this.paginationData.currPage = val
       }
       this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('dict/dictcity/list'),
-        method: 'get',
-        params:
-          this.searchData == undefined
-            ? this.paginationData
-            : Object.assign({}, this.paginationData, this.searchData)
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          // 这里为了解决全部删除第二页数据后，返回到第一页却没有拿到第一页数据的问题
-          if (
-            data.pageList.dataList.length === 0 &&
-            this.paginationData.currPage != 1
-          ) {
-            this.paginationData.currPage -= 1
-            this.getDataList()
-          } else {
-            this.dataList = data.pageList.dataList
-            this.paginationData.totalCount = data.pageList.page.totalCount
-          }
-        } else {
-          this.dataList = []
-          this.paginationData.totalCount = 0
-        }
+      let requestData = Object.assign({}, this.paginationData, this.searchData === undefined ? {} : this.searchData)
+      dictcityList(requestData).then((data) => {
+        this.dataList = data.pageList.dataList
+        this.paginationData.totalCount = data.pageList.page.totalCount
+        this.dataListLoading = false
+      }).catch(e => {
+        this.dataList = []
+        this.paginationData.totalCount = 0
         this.dataListLoading = false
       })
     },
@@ -191,45 +177,45 @@ export default {
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id, type)
       })
-    },
-    // 删除
-    deleteHandle (id) {
-      var ids = id
-        ? [id]
-        : this.dataListSelections.map(item => {
-          return item.id
-        })
-      this.$confirm(
-        `确定要${id ? '删除' : '批量删除'}所选择的数据信息吗？`,
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
-        this.$http({
-          url: this.$http.adornUrl('dict/dictcity/delete'),
-          method: 'delete',
-          data: this.$http.adornData(ids, false)
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.getDataList(1)
-            this.$notify.success({
-              title: '成功',
-              message: '操作成功',
-              duration: 5000
-            })
-          } else {
-            this.$notify.error({
-              title: '错误',
-              message: data.msg,
-              duration: 5000
-            })
-          }
-        })
-      })
     }
+    // 删除
+    // deleteHandle (id) {
+    //   var ids = id
+    //     ? [id]
+    //     : this.dataListSelections.map(item => {
+    //       return item.id
+    //     })
+    //   this.$confirm(
+    //     `确定要${id ? '删除' : '批量删除'}所选择的数据信息吗？`,
+    //     '提示',
+    //     {
+    //       confirmButtonText: '确定',
+    //       cancelButtonText: '取消',
+    //       type: 'warning'
+    //     }
+    //   ).then(() => {
+    //     this.$http({
+    //       url: this.$http.adornUrl('dict/dictcity/delete'),
+    //       method: 'delete',
+    //       data: this.$http.adornData(ids, false)
+    //     }).then(({ data }) => {
+    //       if (data && data.code === 0) {
+    //         this.getDataList(1)
+    //         this.$notify.success({
+    //           title: '成功',
+    //           message: '操作成功',
+    //           duration: 5000
+    //         })
+    //       } else {
+    //         this.$notify.error({
+    //           title: '错误',
+    //           message: data.msg,
+    //           duration: 5000
+    //         })
+    //       }
+    //     })
+    //   })
+    // }
   }
 }
 </script>

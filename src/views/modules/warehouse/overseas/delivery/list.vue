@@ -934,8 +934,7 @@ export default {
         // window.open(
         //   this.$http.tokens(`warehouse/whdeliveryplan/getPackageLabel`,
         //     { 'id': row.id,
-        //       'fbaShipmentId': row.fbaShipmentId,
-        //       'boxQty': 4
+        //       'fbaShipmentId': row.fbaShipmentId
         //     })
         // )
       }

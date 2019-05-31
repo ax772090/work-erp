@@ -1,3 +1,20 @@
+
+import { notifySuccessHander, notifyErrorHander } from '@/components/erp-notification/notification'
+
+/**
+ * 成功弹出提示
+ */
+export function notifySuccess (data) {
+  return notifySuccessHander(data)
+}
+
+/**
+ * 成功弹出提示
+ */
+export function notifyError (data) {
+  return notifyErrorHander(data)
+}
+
 /**
  * 获取uuid
  */
@@ -209,7 +226,7 @@ export function clearTaskId () {
  * 类型检测
  * @param {String} value 值
  */
-export function hasTypeOf (value) {
+function typeOfValue (value) {
   if (value === null) {
     return 'null'
   }
@@ -246,4 +263,28 @@ export function hasTypeOf (value) {
     default:
       return 'unknow'
   }
+}
+
+/**
+ * 类型检测
+ * @param {Object} data 值
+ */
+export function hasTypeOf (data) {
+  let objectData = data
+  for (const key in objectData) {
+    if (objectData.hasOwnProperty(key)) {
+      const element = objectData[key]
+      if (typeOfValue(element) === 'array') {
+        objectData[key] = []
+      } else if (typeOfValue(element) === 'object') {
+        objectData[key] = {}
+      } else if (typeOfValue(element) === 'null') {
+        objectData[key] = null
+      } else {
+        objectData[key] = ''
+      }
+    }
+  }
+  console.log(objectData)
+  return objectData
 }

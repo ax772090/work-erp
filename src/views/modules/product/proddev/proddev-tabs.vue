@@ -297,20 +297,7 @@ export default {
 
       // 新增
       if (type === 'canAdd') {
-        for (const key in this.dataForm) {
-          if (this.dataForm.hasOwnProperty(key)) {
-            const element = this.dataForm[key]
-            if (hasTypeOf(element) === 'array') {
-              this.dataForm[key] = []
-            } else if (hasTypeOf(element) === 'object') {
-              this.dataForm[key] = {}
-            } else if (hasTypeOf(element) === 'null') {
-              this.dataForm[key] = null
-            } else {
-              this.dataForm[key] = ''
-            }
-          }
-        }
+        hasTypeOf(this.dataForm)
         this.dialogTitle = '新品开发立项(新增)'
         this.isAdd = true
         for (const element of this.tabs) {

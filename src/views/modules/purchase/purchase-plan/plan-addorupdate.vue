@@ -87,7 +87,6 @@
                                      label="序号"></el-table-column>
                     <el-table-column prop="prodName"
                                      sortable
-                                     @filter-change="handleFilterChange"
                                      label="产品名称"></el-table-column>
                     <el-table-column prop="prodCode"
                                      sortable
@@ -152,7 +151,7 @@
                                    size="small"
                                    circle
                                    title="删除"
-                                   @click="deleteHandle(scope)">
+                                   @click="deleteHandle(scope.row)">
                           <i class="iconfont erp-icon-shanchu"></i>
                         </el-button>
                       </template>
@@ -384,9 +383,14 @@ export default {
           this.isDisabled = false
           this.type = 'stockApply'
           this.dataForm = parentData
+          // 增加唯一标识
+          for (let i = 0; i < this.dataForm.detailList.length; i++) {
+            this.$set(this.dataForm.detailList[i], 'onlySign', this.createRandomId())
+          }
           this.forbidAdd = true
           this.isAprove = false
           this.dataForm.planDate = new Date()
+          console.log('备货生成', this.dataForm.detailList)
         }
         // 查看
         if (type === 'canCheck') {
@@ -432,6 +436,10 @@ export default {
           }).then(({ data }) => {
             if (data && data.code === 0) {
               this.dataForm = data.poPlanDto
+              // 增加唯一标识
+              for (let i = 0; i < this.dataForm.detailList.length; i++) {
+                this.$set(this.dataForm.detailList[i], 'onlySign', this.createRandomId())
+              }
               this.planUserIdOption = []
               if (data.poPlanDto.sysUserEntity) {
                 this.planUserIdOption.push({
@@ -445,6 +453,7 @@ export default {
               } else {
                 this.forbidAdd = false
               }
+              console.log('wqwd', this.dataForm)
             }
           })
           this.dataListLoading = false
@@ -467,9 +476,22 @@ export default {
         )
       })
     },
+    sortChange (scope) {
+      console.log('ss', scope)
+    },
+    // 生成唯一随机数
+    createRandomId () {
+      return (Math.random() * 10000000).toString(16).substr(0, 4) + '-' + (new Date()).getTime() + '-' + Math.random().toString().substr(2, 5)
+    },
     // 删除=>本地
-    deleteHandle (scope) {
-      this.dataForm.detailList.splice(scope.$index, 1)
+    deleteHandle (row) {
+      console.log(this.dataForm.detailList)
+      // console.log('index', row)
+      this.dataForm.detailList.forEach((item, index) => {
+        if (item.onlySign === row.onlySign) {
+          this.dataForm.detailList.splice(index, 1)
+        }
+      })
     },
     // 子组件添加的数据
     async addList (list) {
@@ -495,6 +517,12 @@ export default {
       for (const data of list) {
         this.dataForm.detailList.push(data)
       }
+      // 增加随机标识
+      for (let i = 0; i < this.dataForm.detailList.length; i++) {
+        // let element = this.dataForm.detailList[i]
+        this.$set(this.dataForm.detailList[i], 'onlySign', this.createRandomId())
+      }
+      console.log('222', this.dataForm.detailList)
     },
     // 保存
     dataFormSubmit: _.debounce(
@@ -685,7 +713,7 @@ export default {
 
     // 数据筛选
     handleFilterChange (filters) {
-
+      console.log('filters', filters)
     },
     // 合计计划汇总
     getSummaries (param) {

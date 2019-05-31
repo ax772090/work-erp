@@ -299,7 +299,7 @@
 // 新增行
 import selectSeach from '@/components/erp-select/select-seach'
 import selectAll from '@/components/erp-select/select-all'
-import { getUrl, dateFormatter, hasTypeOf } from '@/utils/index.js'
+import { getUrl, dateFormatter, hasTypeOf } from '@/utils'
 import { ruleData } from '@/mixins/initData.js'
 // 备注
 import textareaAll from '@/components/erp-input/textarea-all.vue'
@@ -455,20 +455,7 @@ export default {
 
     // 新增
     initAdd () {
-      for (const key in this.dataForm) {
-        if (this.dataForm.hasOwnProperty(key)) {
-          const element = this.dataForm[key]
-          if (hasTypeOf(element) === 'array') {
-            this.dataForm[key] = []
-          } else if (hasTypeOf(element) === 'object') {
-            this.dataForm[key] = {}
-          } else if (hasTypeOf(element) === 'null') {
-            this.dataForm[key] = null
-          } else {
-            this.dataForm[key] = ''
-          }
-        }
-      }
+      hasTypeOf(this.dataForm)
       this.dataForm.requestDate = dateFormatter(new Date(), false)
       this.dataForm.settleDate = dateFormatter(new Date(), false)
       this.dataForm.payDate = dateFormatter(new Date(), false)

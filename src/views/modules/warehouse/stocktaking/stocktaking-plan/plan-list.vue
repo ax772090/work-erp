@@ -34,8 +34,8 @@
                        sortable
                        label="方案编号">
         <template slot-scope="scope">
-            <a class="a-click-hover"
-               @click="addOrUpdateHandle(scope.row.id, 'isDisabled')">{{scope.row.code}}</a>
+          <a class="a-click-hover"
+             @click="addOrUpdateHandle(scope.row.id, 'isDisabled')">{{scope.row.code}}</a>
         </template>
       </el-table-column>
       <el-table-column prop="compName"
@@ -120,51 +120,45 @@ export default {
       // 时间过滤
       expectDate: '',
       // 下拉
-      searchOptions: [
-        {
-          label: '库存公司',
-          value: 'compId',
-          inputType: 'el-select',
+      searchOptions: [{
+        label: '库存公司',
+        value: 'compId',
+        inputType: 'el-select',
 
-          httpUrl: 'sys/organization/select',
-          dataSource: 'companyList',
-          title: 'compIdList',
-          dataValue: 'orgId',
-          dataLabel: 'name',
-          placeholder: '库存公司'
-        },
-        {
-          label: '方案编号',
-          value: 'code',
-          inputType: 'el-input'
-        },
-        {
-          label: '盘点表分单维度',
-          value: 'dimension',
-          inputType: 'el-select',
-          httpUrl: 'basicData/queryDataDict2List',
-          requestParams: { dataDictKey: 'STOCKTAKINGDIMENSION' },
-          dataSource: 'fontMaps',
-          title: 'dimension',
-          dataValue: 'key',
-          dataLabel: 'value',
-          placeholder: '盘点表分单维度'
-        },
-        {
-          label: '盘点日期',
-          value: 'dateRange',
-          inputType: 'el-daterangeArr'
-        },
-        {
-          label: '是否已生成盘点表',
-          value: 'bGenerate',
-          inputType: 'el-select',
-          dataList: [{ status: 1, name: '是' }, { status: 0, name: '否' }],
-          dataValue: 'status',
-          dataLabel: 'name',
-          placeholder: '是/否'
-        }
-      ],
+        httpUrl: 'sys/organization/select',
+        dataSource: 'companyList',
+        title: 'compIdList',
+        dataValue: 'orgId',
+        dataLabel: 'name',
+        placeholder: '库存公司'
+      }, {
+        label: '方案编号',
+        value: 'code',
+        inputType: 'el-input'
+      }, {
+        label: '盘点表分单维度',
+        value: 'dimension',
+        inputType: 'el-select',
+        httpUrl: 'basicData/queryDataDict2List',
+        requestParams: { dataDictKey: 'STOCKTAKINGDIMENSION' },
+        dataSource: 'fontMaps',
+        title: 'dimension',
+        dataValue: 'key',
+        dataLabel: 'value',
+        placeholder: '盘点表分单维度'
+      }, {
+        label: '盘点日期',
+        value: 'dateRange',
+        inputType: 'el-daterangeArr'
+      }, {
+        label: '是否已生成盘点表',
+        value: 'bGenerate',
+        inputType: 'el-select',
+        dataList: [{ status: 1, name: '是' }, { status: 0, name: '否' }],
+        dataValue: 'status',
+        dataLabel: 'name',
+        placeholder: '是/否'
+      }],
 
       dataList: [],
       dataListLoading: false,

@@ -105,6 +105,7 @@
 <script>
 import selectSeach from '@/components/erp-select/select-seach'
 import selectAll from '@/components/erp-select/select-all'
+import { basicBasicchannelListcombobox, dictPlantformType, dictSaleType } from '@/api/common/common.api'
 export default {
   components: {
     selectSeach,
@@ -170,22 +171,10 @@ export default {
     // 要货平台下的店铺
     selectChange (value, type) {
       if (type) {
-        this.$http
-          .get(this.$http.adornUrl('basic/basicchannel/listcombobox'), {
-            params: { platformType: value }
-          })
-          .then(({ data }) => {
-            this.channelIdOptions = data.list
-          })
+        basicBasicchannelListcombobox({ platformType: value }).then(data => { this.channelIdOptions = data.list })
       } else {
         this.dataForm.channelId = ''
-        this.$http
-          .get(this.$http.adornUrl('basic/basicchannel/listcombobox'), {
-            params: { platformType: value }
-          })
-          .then(({ data }) => {
-            this.channelIdOptions = data.list
-          })
+        basicBasicchannelListcombobox({ platformType: value }).then(data => { this.channelIdOptions = data.list })
       }
     },
     // 取消按钮
@@ -208,7 +197,7 @@ export default {
         this.$refs['dataForm'].resetFields()
       })
       // 销售平台
-      this.queryDataDict2List('PLANTFORM_TYPE')
+      dictPlantformType().then(data => { this.dictSalePlatformOptions = data.fontMaps })
       if (id === '') {
         this.dataForm.shippingMethod = '02'
         this.prodDataList = []
@@ -216,7 +205,7 @@ export default {
         this.selectChange(this.dataForm.dictSalePlatform)
       }
       // 销售类型
-      this.queryDataDict2List('SALE_TYPE')
+      dictSaleType().then(data => { this.dictSaleTypeOptions = data.fontMaps })
       this.dataForm.id = id
       this.isUpdate = false
       this.dataForm.prodId = ''
@@ -242,25 +231,6 @@ export default {
           }
         })
       }
-    },
-
-    // 查数据字典--销售类型
-    queryDataDict2List (dictionaries) {
-      this.$http({
-        url: this.$http.adornUrl('basicData/queryDataDict2List'),
-        method: 'get',
-        params: this.$http.adornParams({
-          dataDictKey: dictionaries
-        }, false)
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          if (dictionaries === 'SALE_TYPE') {
-            this.dictSaleTypeOptions = data.fontMaps
-          } else if (dictionaries === 'PLANTFORM_TYPE') {
-            this.dictSalePlatformOptions = data.fontMaps
-          }
-        }
-      })
     },
 
     // 选择中文名或者产品id，带出相应数据

@@ -56,11 +56,10 @@
           <el-table :data="scope.row.tableDataExpand">
             <el-table-column prop="prodBasicEntity.code"
                              sortable
-                             label="产品编码">
-            </el-table-column>
+                             label="产品编码">            </el-table-column>
             <el-table-column prop="prodBasicEntity.nameCh"
                              label="产品名称"></el-table-column>
-            <el-table-column prop="specifications"
+            <el-table-column prop="prodBasicEntity.specifications"
                              label="规格型号"></el-table-column>
             <el-table-column prop="allStock"
                              sortable

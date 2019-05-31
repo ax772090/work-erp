@@ -62,6 +62,8 @@ import selectSeach from '@/components/erp-select/select-seach'
 import selectAll from '@/components/erp-select/select-all'
 // 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
+import { prodimageSave, basicbrandInfo, basicbrandSave, basicbrandUpdate } from '@/api/basic/basic.js'
+
 export default {
   components: {
     selectSeach,
@@ -115,6 +117,14 @@ export default {
     UploadFile (options) {
       let data = new FormData()
       data.append(options.filename, options.file)
+      // prodimageSave(data).then((data) => {
+      //   this.dataForm.logos = {}
+      //   this.dataForm.logos['id'] = data.id
+      //   this.dataForm.logos['url'] = data.url
+      //   this.imageUrl = this.$http.adornUrl(data.url)
+      // }).catch((error) => {
+      //   this.notifyError(error.data.msg)
+      // })
       this.$http({
         url: this.$http.adornUrl(`prod/prodimage/save`),
         method: 'post',
@@ -135,21 +145,6 @@ export default {
       })
     },
 
-    // 通过id查找图片
-    getImage () {
-      if (this.dataForm.logos) {
-        this.$http({
-          url: this.$http.adornUrl(`/prod/prodimage/info/${this.dataForm.logos.id}`),
-          method: 'get',
-          params: this.$http.adornParams()
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.imageUrl = this.$http.adornUrl(data.logos.url)
-          }
-        })
-      }
-    },
-
     beforeRemove (file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`)
     },
@@ -165,20 +160,52 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(`basic/basicbrand/info/${this.dataForm.id}`),
-            method: 'get',
-            params: this.$http.adornParams({ id: this.dataForm.id })
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm = data.basicBrand
-              if (data.basicBrand.logos.url) {
-                this.imageUrl = this.$http.adornUrl(data.basicBrand.logos.url)
-              }
+          basicbrandInfo(this.dataForm.id, true).then((data) => {
+            this.dataForm = data.basicBrand
+            if (data.basicBrand.logos.url) {
+              this.imageUrl = this.$http.adornUrl(data.basicBrand.logos.url)
             }
+          }).catch((error) => {
+            this.notifyError(error.data.msg)
           })
+          // this.$http({
+          //   url: this.$http.adornUrl(`basic/basicbrand/info/${this.dataForm.id}`),
+          //   method: 'get',
+          //   params: this.$http.adornParams({ id: this.dataForm.id })
+          // }).then(({ data }) => {
+          //   if (data && data.code === 0) {
+          //     this.dataForm = data.basicBrand
+          //     if (data.basicBrand.logos.url) {
+          //       this.imageUrl = this.$http.adornUrl(data.basicBrand.logos.url)
+          //     }
+          //   }
+          // })
         }
       })
+    },
+    // 新增/编辑
+    basicbrandHttp () {
+      // 新增
+      if (!this.dataForm.id) {
+        basicbrandSave(this.dataForm).then((data) => {
+          this.clearCache('dataForm')
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
+      // 编辑
+      if (this.dataForm.id) {
+        basicbrandUpdate(this.dataForm).then((data) => {
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
     },
 
     // 表单提交
@@ -186,28 +213,7 @@ export default {
       async function dataFormSubmit () {
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(`/basic/basicbrand/${!this.dataForm.id ? 'save' : 'update'}`),
-              method: !this.dataForm.id ? 'post' : 'put',
-              data: this.$http.adornData(this.dataForm, false)
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.clearCache('dataForm')
-                this.$emit('refreshDataList')
-                this.visible = false
-                this.$notify.success({
-                  title: '成功',
-                  message: '操作成功',
-                  duration: 1500
-                })
-              } else {
-                this.$notify.error({
-                  title: '失败',
-                  message: data.msg,
-                  duration: 5000
-                })
-              }
-            })
+            this.basicbrandHttp()
           }
         })
       }, 1000, {

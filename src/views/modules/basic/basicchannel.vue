@@ -105,7 +105,7 @@ import erpSearchPanel from '@/components/erp-search-panel'
 import paginationAll from '@/components/erp-pagination/pagination-all'
 import AddOrUpdate from './basicchannel-add-or-update'
 import { initData } from '@/mixins/initData.js'
-import { basicChannelList, basicChannelActiveOrDis } from '@/api/basic/basic.js'
+import { basicChannelList, basicChannelActiveOrDis } from '@/api/basic/basic'
 
 export default {
   mixins: [initData],

@@ -87,6 +87,7 @@
 <script>
 import selectSeach from '@/components/erp-select/select-seach'
 import selectAll from '@/components/erp-select/select-all'
+import { hasTypeOf } from '@/utils'
 
 export default {
   components: {
@@ -125,27 +126,14 @@ export default {
     }
   },
   created () {
-    this.$http
-      .get(this.$http.adornUrl('sys/organization/select'))
-      .then(({ data }) => {
-        this.compIdOption = data.companyList
-      })
-    this.$http
-      .get(this.$http.adornUrl('basic/basiccategory/treeList'), {
-        params: { id: this.dataForm.categoryIds || '' }
-      })
-      .then(({ data }) => {
-        this.categoryIdsOption = data.treeList || []
-      })
+    this.$http.get(this.$http.adornUrl('sys/organization/select')).then(({ data }) => { this.compIdOption = data.companyList })
+    this.$http.get(this.$http.adornUrl('basic/basiccategory/treeList'), { params: { id: this.dataForm.categoryIds || '' } }).then(({ data }) => { this.categoryIdsOption = data.treeList || [] })
   },
   methods: {
     init (id, type) {
-      this.dataForm.addTime = ''
-      this.dataForm.addUser = ''
-      this.dataForm.updTime = ''
-      this.dataForm.updUser = ''
-      this.dataForm.confirmTime = ''
-      this.dataForm.confirmUser = ''
+      hasTypeOf(this.dataForm)
+      this.dataForm.dimension = '01'
+      this.dataForm.rangeConfig = '1'
       this.visible = true
       this.dataForm.id = id
       this.add(id, type)
@@ -158,8 +146,7 @@ export default {
           }).then(({ data }) => {
             if (data && data.code === 0) {
               this.compIdChange(data.whStocktakingPlan.compId)
-              data.whStocktakingPlan.rangeConfig =
-                data.whStocktakingPlan.rangeConfig + ''
+              data.whStocktakingPlan.rangeConfig = data.whStocktakingPlan.rangeConfig + ''
               if (data.whStocktakingPlan.categoryIds) {
                 this.categoryIds = data.levelPath.split('.')
               }

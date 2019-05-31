@@ -136,7 +136,8 @@ import selectSeach from '@/components/erp-select/select-seach'
 import selectAll from '@/components/erp-select/select-all'
 // 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
-import { basicChannelSave, basicChannelUpdate, basicChannelInfo } from '@/api/basic/basic.js'
+import { basicChannelSave, basicChannelUpdate, basicChannelInfo } from '@/api/basic/basic'
+import { listComboboxCompany, basecBasicwarehouseQuerywhbyproperty, dictPlantformType, basicdataQueryallcountry, mwsdatamwsauthorize } from '@/api/common/common.api'
 export default {
   components: {
     selectSeach,
@@ -203,15 +204,15 @@ export default {
   },
   created () {
     // 销售公司
-    this.$http.get(this.$http.adornUrl('list/combobox/company')).then(({ data }) => { this.compIdOptions = data.list })
+    listComboboxCompany().then(data => { this.compIdOptions = data.list })
     // 仓库过滤
-    this.$http.get(this.$http.adornUrl('basic/basicwarehouse/queryWhByProperty'), { params: { property: 'FBA' } }).then(({ data }) => { this.warehouseIdOptions = data.list })
+    basecBasicwarehouseQuerywhbyproperty({ property: 'FBA' }).then(data => { this.warehouseIdOptions = data.list })
     // 隶属平台
-    this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'PLANTFORM_TYPE' } }).then(({ data }) => { this.dictPlantformTypeOptions = data.fontMaps })
+    dictPlantformType().then(data => { this.dictPlantformTypeOptions = data.fontMaps })
     // 国家
-    this.$http.get(this.$http.adornUrl('basicData/queryAllCountry')).then(({ data }) => { this.belongCountryOptions = data.countries })
+    basicdataQueryallcountry().then(data => { this.belongCountryOptions = data.countries })
     // 市场
-    this.$http.get(this.$http.adornUrl('mwsData/mwsAuthorize')).then(({ data }) => { this.marketOptions = data.mwsAuthorize })
+    mwsdatamwsauthorize().then(data => { this.marketOptions = data.mwsAuthorize })
   },
 
   methods: {

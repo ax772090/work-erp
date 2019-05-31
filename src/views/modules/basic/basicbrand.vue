@@ -94,6 +94,7 @@ import tableImg from '@/components/list-table/table-img'
 
 import AddOrUpdate from './basicbrand-add-or-update'
 import { initData } from '@/mixins/initData.js'
+import { basicbrandList, basicbrandActiveOrDis } from '@/api/basic/basic.js'
 
 export default {
   mixins: [initData],
@@ -140,18 +141,14 @@ export default {
         this.paginationData.currPage = val
       }
       this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('basic/basicbrand/list'),
-        method: 'get',
-        params: this.searchData === undefined ? this.paginationData : Object.assign({}, this.paginationData, this.searchData)
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.dataList = data.pageList.dataList
-          this.paginationData.totalCount = data.pageList.page.totalCount
-        } else {
-          this.dataList = []
-          this.paginationData.totalCount = 0
-        }
+      let requestData = Object.assign({}, this.paginationData, this.searchData === undefined ? {} : this.searchData)
+      basicbrandList(requestData).then((data) => {
+        this.dataList = data.pageList.dataList
+        this.paginationData.totalCount = data.pageList.page.totalCount
+        this.dataListLoading = false
+      }).catch(() => {
+        this.dataList = []
+        this.paginationData.totalCount = 0
         this.dataListLoading = false
       })
     },
@@ -176,31 +173,19 @@ export default {
         for (let i = 0; i < this.dataListSelections.length; i++) {
           ListSelects.push(this.dataListSelections[i].id)
         }
-        this.$http({
-          url: this.$http.adornUrl('basic/basicbrand/activeOrDis/'),
-          method: 'post',
-          data: this.$http.adornData(
-            {
-              activeOrNot: status,
-              ids: ListSelects
-            },
-            false
-          )
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.getDataList()
-            this.$notify.success({
-              title: '成功',
-              message: '操作成功',
-              duration: 1500
-            })
-          } else {
-            this.$notify.error({
-              title: '错误',
-              message: data.msg,
-              duration: 5000
-            })
-          }
+        basicbrandActiveOrDis({activeOrNot: status, ids: ListSelects}).then((data) => {
+          this.getDataList()
+          this.$notify.success({
+            title: '成功',
+            message: '操作成功',
+            duration: 1500
+          })
+        }).catch((error) => {
+          this.$notify.error({
+            title: '错误',
+            message: error.msg,
+            duration: 5000
+          })
         })
       }, 1000, {
         leading: true,

@@ -197,19 +197,9 @@ export default {
   methods: {
     getDataUrl () {
       // 公司
-      this.$http
-        .get(this.$http.adornUrl('sys/organization/select'))
-        .then(({ data }) => {
-          this.compIdOption = data.companyList
-        })
+      this.$http.get(this.$http.adornUrl('sys/organization/select')).then(({ data }) => { this.compIdOption = data.companyList })
       // 单据状态
-      this.$http
-        .get(this.$http.adornUrl('basicData/queryDataDict2List'), {
-          params: { dataDictKey: 'APPROVAL_STATUS' }
-        })
-        .then(({ data }) => {
-          this.dictDocStatusOption = data.fontMaps
-        })
+      this.$http.get(this.$http.adornUrl('basicData/queryDataDict2List'), { params: { dataDictKey: 'APPROVAL_STATUS' } }).then(({ data }) => { this.dictDocStatusOption = data.fontMaps })
     },
     init (id, type, parentData) {
       this.visible = true
@@ -249,17 +239,17 @@ export default {
       })
 
       this.$nextTick(() => {
+        this.dataListLoading = true
         if (this.dataForm.docInfo.id) {
           this.$http({
-            url: this.$http.adornUrl(
-              `warehouse/whstocktaking/info/${this.dataForm.docInfo.id}`
-            ),
+            url: this.$http.adornUrl(`warehouse/whstocktaking/info/${this.dataForm.docInfo.id}`),
             method: 'get'
           }).then(({ data }) => {
             if (data && data.code === 0) {
               this.dataForm.docInfo = data.docInfo
               this.dataForm.docDetail = data.docDetail
             }
+            this.dataListLoading = false
           })
         }
       })
@@ -350,8 +340,7 @@ export default {
             this.$http({
               url: this.$http.adornUrl('warehouse/whstocktaking/saveAndSubmit'),
               method: 'post',
-              data: Object.assign({}, this.dataForm, { flowParams:
-                {
+              data: Object.assign({}, this.dataForm, {                flowParams: {
                   businessId: this.dataForm.docInfo.id,
                   routeUrl: getUrl(),
                   code: this.dataForm.docInfo.code,

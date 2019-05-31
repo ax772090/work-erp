@@ -49,6 +49,7 @@ export default {
       this.visible = true
       this.dataForm.id = row.id
       this.dataForm.fbaShipmentId = row.fbaShipmentId
+      this.dataForm.boxQty = row.totalBoxQty
       this.dialogTitle = '打印箱唛'
     },
     // 关闭清除本次缓存

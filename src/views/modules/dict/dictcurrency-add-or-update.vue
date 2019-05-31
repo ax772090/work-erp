@@ -95,6 +95,9 @@
 <script>
 // 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
+import { dictCurrencyRound, dictCurrencySymbol } from '@/api/common/common.api'
+import { dictCurrencyInfo, dictCurrencySave, dictCurrencyUpdate } from '@/api/basic/basic.js'
+
 export default {
   components: {
     textareaAll
@@ -193,9 +196,9 @@ export default {
   },
   created () {
     // 四舍五入
-    this.queryDataDict2List('CURRENCY_ROUND')
+    dictCurrencyRound().then(data => { this.dataForm.dictCurrencyRound.options = data.fontMaps })
     // 货币符号
-    this.queryDataDict2List('CURRENCY_SYMBOL')
+    dictCurrencySymbol().then(data => { this.dataForm.dictCurrencySymbol.options = data.fontMaps })
   },
   methods: {
     // 关闭清除本次缓存
@@ -216,26 +219,7 @@ export default {
     cancel (formName) {
       this.clearCache(formName)
     },
-    // 查数据字典
-    queryDataDict2List (dictionaries) {
-      this.$http({
-        url: this.$http.adornUrl('basicData/queryDataDict2List'),
-        method: 'get',
-        params: this.$http.adornParams({
-          dataDictKey: dictionaries
-        })
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          // 四舍五入
-          if (dictionaries == 'CURRENCY_ROUND') {
-            this.dataForm.dictCurrencyRound.options = data.fontMaps
-            // 货币符号
-          } else if (dictionaries == 'CURRENCY_SYMBOL') {
-            this.dataForm.dictCurrencySymbol.options = data.fontMaps
-          }
-        }
-      })
-    },
+
     init (id, type) {
       this.dataForm.addTime = ''
       this.dataForm.addUser = ''
@@ -249,75 +233,84 @@ export default {
         this.$refs['dataForm'].resetFields()
         if (this.dataForm.id) {
           this.isDisabled = true
-          this.$http({
-            url: this.$http.adornUrl(
-              `/dict/dictcurrency/info/${this.dataForm.id}`
-            ),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm.code = data.dictCurrency.code
-              this.dataForm.name = data.dictCurrency.name
-              this.dataForm.uniteAccuracy.value =
-                data.dictCurrency.uniteAccuracy
-              this.dataForm.moneyAccuracy.value =
-                data.dictCurrency.moneyAccuracy
-              this.dataForm.dictCurrencySymbol.value =
-                data.dictCurrency.dictCurrencySymbol
-              this.dataForm.displaySymbols = data.dictCurrency.displaySymbols
-              this.dataForm.dictCurrencyRound.value =
-                data.dictCurrency.dictCurrencyRound
-              this.dataForm.remarks = data.dictCurrency.remarks
-              this.dataForm.bUsed = data.dictCurrency.bUsed
-            }
+          dictCurrencyInfo(this.dataForm.id, true).then(data => {
+            this.dataForm.code = data.dictCurrency.code
+            this.dataForm.name = data.dictCurrency.name
+            this.dataForm.uniteAccuracy.value =
+              data.dictCurrency.uniteAccuracy
+            this.dataForm.moneyAccuracy.value =
+              data.dictCurrency.moneyAccuracy
+            this.dataForm.dictCurrencySymbol.value =
+              data.dictCurrency.dictCurrencySymbol
+            this.dataForm.displaySymbols = data.dictCurrency.displaySymbols
+            this.dataForm.dictCurrencyRound.value =
+              data.dictCurrency.dictCurrencyRound
+            this.dataForm.remarks = data.dictCurrency.remarks
+            this.dataForm.bUsed = data.dictCurrency.bUsed
+          }).catch(e => {
+            this.notifyError(e.data.msg)
           })
         }
       })
+    },
+    // 新增/编辑
+    dictcurrencyHttp () {
+      // 新增
+      if (!this.dataForm.id) {
+        dictCurrencySave(
+          {
+            id: this.dataForm.id,
+            code: this.dataForm.code,
+            name: this.dataForm.name,
+            uniteAccuracy: this.dataForm.uniteAccuracy.value,
+            moneyAccuracy: this.dataForm.moneyAccuracy.value,
+            dictCurrencySymbol: this.dataForm.dictCurrencySymbol.value,
+            displaySymbols: this.dataForm.displaySymbols == true ? 1 : 0,
+            dictCurrencyRound: this.dataForm.dictCurrencyRound.value,
+            // 'rate': this.dataForm.rate,
+            remarks: this.dataForm.remarks,
+            bUsed: this.dataForm.bUsed
+          }
+        ).then((data) => {
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
+      // 编辑
+      if (this.dataForm.id) {
+        dictCurrencyUpdate({
+          id: this.dataForm.id,
+          code: this.dataForm.code,
+          name: this.dataForm.name,
+          uniteAccuracy: this.dataForm.uniteAccuracy.value,
+          moneyAccuracy: this.dataForm.moneyAccuracy.value,
+          dictCurrencySymbol: this.dataForm.dictCurrencySymbol.value,
+          displaySymbols: this.dataForm.displaySymbols == true ? 1 : 0,
+          dictCurrencyRound: this.dataForm.dictCurrencyRound.value,
+          // 'rate': this.dataForm.rate,
+          remarks: this.dataForm.remarks,
+          bUsed: this.dataForm.bUsed
+        }).then((data) => {
+          this.clearCache('dataForm')
+          this.$emit('refreshDataList')
+          this.visible = false
+          this.notifySuccess('操作成功')
+        }).catch((error) => {
+          this.notifyError(error.data.msg)
+        })
+      }
     },
     // 表单提交
     dataFormSubmit: _.debounce(
       async function dataFormSubmit () {
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(
-                `/dict/dictcurrency/${!this.dataForm.id ? 'save' : 'update'}`
-              ),
-              method: !this.dataForm.id ? 'post' : 'put',
-              data: this.$http.adornData(
-                {
-                  id: this.dataForm.id,
-                  code: this.dataForm.code,
-                  name: this.dataForm.name,
-                  uniteAccuracy: this.dataForm.uniteAccuracy.value,
-                  moneyAccuracy: this.dataForm.moneyAccuracy.value,
-                  dictCurrencySymbol: this.dataForm.dictCurrencySymbol.value,
-                  displaySymbols: this.dataForm.displaySymbols == true ? 1 : 0,
-                  dictCurrencyRound: this.dataForm.dictCurrencyRound.value,
-                  // 'rate': this.dataForm.rate,
-                  remarks: this.dataForm.remarks,
-                  bUsed: this.dataForm.bUsed
-                },
-                false
-              )
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.clearCache('dataForm')
-                this.$emit('refreshDataList')
-                this.$notify.success({
-                  title: '成功',
-                  message: '操作成功',
-                  duration: 5000
-                })
-              } else {
-                this.$notify.error({
-                  title: '错误',
-                  message: data.msg,
-                  duration: 5000
-                })
-              }
-            })
+            this.dictcurrencyHttp()
+          } else {
+            return false
           }
         })
       }, 1000, {

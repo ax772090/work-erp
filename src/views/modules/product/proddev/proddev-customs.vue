@@ -69,6 +69,7 @@ import Bus from '@/components/js/bus.js'
 // 备注组件
 import textareaAll from '@/components/erp-input/textarea-all'
 import { ruleData } from '@/mixins/initData.js'
+import { dictDictcurrencyListcombobox, dictDictunitListcombobox } from '@/api/common/common.api'
 export default {
   name: 'proddevCustoms',
   props: ['value'],
@@ -105,9 +106,9 @@ export default {
   },
   created () {
     // 币种主键
-    this.$http.get(this.$http.adornUrl('dict/dictcurrency/listcombobox')).then(({ data }) => { this.currencyIdOptions = data.list })
+    dictDictcurrencyListcombobox().then(data => { this.currencyIdOptions = data.list })
     // 报关单位
-    this.$http.get(this.$http.adornUrl('/dict/dictunit/listcombobox')).then(({ data }) => { this.customsUnitIdOptions = data.list })
+    dictDictunitListcombobox().then(data => { this.customsUnitIdOptions = data.list })
   },
   methods: {
     init (id, type, handleType, row) {

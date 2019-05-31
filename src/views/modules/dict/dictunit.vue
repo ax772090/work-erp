@@ -100,6 +100,8 @@ import AddOrUpdate from './dictunit-add-or-update'
 // 分页
 import paginationAll from '@/components/erp-pagination/pagination-all'
 import { initData } from '@/mixins/initData.js'
+import { dictUnitList, dictUnitActiveOrDis } from '@/api/basic/basic.js'
+
 export default {
   mixins: [initData],
   components: {
@@ -145,31 +147,14 @@ export default {
         for (let i = 0; i < this.dataListSelections.length; i++) {
           ListSelects.push(this.dataListSelections[i].id)
         }
-        this.$http({
-          url: this.$http.adornUrl('dict/dictunit/activeOrDis'),
-          method: 'post',
-          data: this.$http.adornData(
-            {
-              activeOrNot: status,
-              ids: ListSelects
-            },
-            false
-          )
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.getDataList()
-            this.$notify.success({
-              title: '成功',
-              message: '操作成功',
-              duration: 1500
-            })
-          } else {
-            this.$notify.error({
-              title: '错误',
-              message: data.msg,
-              duration: 5000
-            })
-          }
+        dictUnitActiveOrDis({
+          activeOrNot: status,
+          ids: ListSelects
+        }).then(data => {
+          this.getDataList()
+          this.notifySuccess('操作成功')
+        }).catch(e => {
+          this.notifyError(e.data.msg)
         })
       }, 1000, {
         leading: true,
@@ -183,21 +168,14 @@ export default {
         this.paginationData.currPage = val
       }
       this.dataListLoading = true
-      this.$http({
-        url: this.$http.adornUrl('dict/dictunit/list'),
-        method: 'get',
-        params:
-          this.searchData == undefined
-            ? this.paginationData
-            : Object.assign({}, this.paginationData, this.searchData)
-      }).then(({ data }) => {
-        if (data && data.code === 0) {
-          this.dataList = data.pageList.dataList
-          this.paginationData.totalCount = data.pageList.page.totalCount
-        } else {
-          this.dataList = []
-          this.paginationData.totalCount = 0
-        }
+      let requestData = Object.assign({}, this.paginationData, this.searchData === undefined ? {} : this.searchData)
+      dictUnitList(requestData).then((data) => {
+        this.dataList = data.pageList.dataList
+        this.paginationData.totalCount = data.pageList.page.totalCount
+        this.dataListLoading = false
+      }).catch(() => {
+        this.dataList = []
+        this.paginationData.totalCount = 0
         this.dataListLoading = false
       })
     },
@@ -211,45 +189,45 @@ export default {
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id, type)
       })
-    },
-    // 删除
-    deleteHandle (id) {
-      var ids = id
-        ? [id]
-        : this.dataListSelections.map(item => {
-          return item.id
-        })
-      this.$confirm(
-        `确定要${id ? '删除' : '批量删除'}所选择的数据信息吗？`,
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).then(() => {
-        this.$http({
-          url: this.$http.adornUrl('dict/dictunit/delete'),
-          method: 'delete',
-          data: this.$http.adornData(ids, false)
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.getDataList(1)
-            this.$notify.success({
-              title: '成功',
-              message: '操作成功',
-              duration: 500
-            })
-          } else {
-            this.$notify.error({
-              title: '错误',
-              message: data.msg,
-              duration: 5000
-            })
-          }
-        })
-      })
     }
+    // 删除
+    // deleteHandle (id) {
+    //   var ids = id
+    //     ? [id]
+    //     : this.dataListSelections.map(item => {
+    //       return item.id
+    //     })
+    //   this.$confirm(
+    //     `确定要${id ? '删除' : '批量删除'}所选择的数据信息吗？`,
+    //     '提示',
+    //     {
+    //       confirmButtonText: '确定',
+    //       cancelButtonText: '取消',
+    //       type: 'warning'
+    //     }
+    //   ).then(() => {
+    //     this.$http({
+    //       url: this.$http.adornUrl('dict/dictunit/delete'),
+    //       method: 'delete',
+    //       data: this.$http.adornData(ids, false)
+    //     }).then(({ data }) => {
+    //       if (data && data.code === 0) {
+    //         this.getDataList(1)
+    //         this.$notify.success({
+    //           title: '成功',
+    //           message: '操作成功',
+    //           duration: 500
+    //         })
+    //       } else {
+    //         this.$notify.error({
+    //           title: '错误',
+    //           message: data.msg,
+    //           duration: 5000
+    //         })
+    //       }
+    //     })
+    //   })
+    // }
   }
 }
 </script>
